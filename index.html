@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Junior Linux Lab - Modern Linux Classes for School Students</title>
+  <meta name="description" content="Unlock real-world computer science skills. Hands-on, engaging Linux command line, scripting, and system administration classes for kids and teens aged 10-18.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Ubuntu+Mono:wght@400;700&family=Red+Hat+Text:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- CSS Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <header class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="#" class="nav-logo" id="nav-logo">
+        <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect>
+          <rect x="9" y="9" width="6" height="6"></rect>
+          <line x1="9" y1="1" x2="9" y2="4"></line>
+          <line x1="15" y1="1" x2="15" y2="4"></line>
+          <line x1="9" y1="20" x2="9" y2="23"></line>
+          <line x1="15" y1="20" x2="15" y2="23"></line>
+          <line x1="20" y1="9" x2="23" y2="9"></line>
+          <line x1="20" y1="15" x2="23" y2="15"></line>
+          <line x1="1" y1="9" x2="4" y2="9"></line>
+          <line x1="1" y1="15" x2="4" y2="15"></line>
+        </svg>
+        <span>Junior Linux Lab</span>
+      </a>
+      
+      <nav class="nav-links" id="nav-links-menu">
+        <a href="#curriculum" class="nav-link">Curriculum</a>
+        <a href="#parents" class="nav-link">For Parents</a>
+        <a href="#pricing" class="nav-link">Schedule & Pricing</a>
+        <a href="#faq" class="nav-link">FAQs</a>
+      </nav>
+
+      <div class="nav-actions">
+        <button class="btn btn-secondary btn-sm login-nav-btn" id="login-nav-btn" aria-label="Student or teacher login">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          <span>Login</span>
+        </button>
+        <a href="#pricing" class="btn btn-primary btn-sm" id="enroll-nav-btn">Enroll Now</a>
+        <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle Navigation Menu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero-section" id="hero">
+    <div class="hero-bg-glow"></div>
+    <div class="container hero-container">
+      <div class="hero-content">
+        <div class="badge-new">🚀 Cohorts starting this week!</div>
+        <h1 class="hero-title">Master Linux.<br><span class="gradient-text">Control the Future.</span></h1>
+        <p class="hero-description">
+          The world runs on computers, but most kids only know how to use phones and tablets. We teach kids and teens (ages 8-15) real tech skills—combining Linux systems and coding fundamentals to build functional projects.
+        </p>
+        <div class="hero-ctas">
+          <a href="#curriculum" class="btn btn-primary btn-lg">Explore Tracks</a>
+          <a href="#projects" class="btn btn-secondary btn-lg">View Projects</a>
+        </div>
+        <div class="hero-stats">
+          <div class="stat-item">
+            <span class="stat-num">6+</span>
+            <span class="stat-lbl">Real Projects Built</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-num">2 Tracks</span>
+            <span class="stat-lbl">Linux + Coding</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-num">100%</span>
+            <span class="stat-lbl">Hands-On Learning</span>
+          </div>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="mascot-wrapper">
+          <img src="assets/tux-mascot.jpg" alt="Junior Linux Lab Mascot Penguin wearing neon smart glasses" class="mascot-img">
+          <div class="floating-card c1">
+            <span class="card-icon">🎮</span>
+            <div>
+              <h4>Guessing Game</h4>
+              <p>Project Active</p>
+            </div>
+          </div>
+          <div class="floating-card c2">
+            <span class="card-icon">📁</span>
+            <div>
+              <h4>File Organizer</h4>
+              <p>Code Complete</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Terminal Section -->
+  <section class="terminal-section" id="terminal-sandbox">
+    <div class="container">
+      <div class="section-header text-center">
+        <h2 class="section-title">Interactive <span class="gradient-text">Bash Simulator</span></h2>
+        <p class="section-subtitle">No setup required! Students learn directly inside a secure sandbox. Try running some command line tools below.</p>
+      </div>
+
+      <div class="terminal-window">
+        <div class="terminal-header">
+          <div class="terminal-dots">
+            <span class="dot red"></span>
+            <span class="dot yellow"></span>
+            <span class="dot green"></span>
+          </div>
+          <span class="terminal-title">eric@academy-sandbox: ~</span>
+          <span class="terminal-badge">LINUX v6.1</span>
+        </div>
+        <div class="terminal-body" id="terminal-body">
+          <div class="terminal-line system-msg">Welcome to Junior Linux Lab Interactive Sandbox!</div>
+          <div class="terminal-line system-msg">Type <span class="terminal-highlight">help</span> to view available commands.</div>
+          <br>
+          <div class="terminal-output-container" id="terminal-outputs">
+            <!-- Simulated outputs will go here -->
+          </div>
+          <div class="terminal-input-row">
+            <span class="terminal-prompt">eric@academy:~$</span>
+            <input type="text" id="terminal-input" autofocus autocomplete="off" spellcheck="false" placeholder="type a command...">
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Curriculum Section -->
+  <section class="curriculum-section" id="curriculum">
+    <div class="container">
+      <div class="section-header text-center">
+        <h2 class="section-title">What Your Child <span class="gradient-text">Will Learn</span></h2>
+        <p class="section-subtitle">We teach two powerful skill sets—Linux and Coding—in a fun, beginner-friendly way, tailored for ages 8-15.</p>
+      </div>
+
+      <div class="curriculum-grid" style="grid-template-columns: repeat(2, 1fr); max-width: 900px; margin: 0 auto;">
+        <!-- Track 1: Linux -->
+        <div class="curriculum-card featured">
+          <div class="card-level">Track 1</div>
+          <h3 class="card-title">Linux Fundamentals</h3>
+          <p class="card-meta">🐧 System Administration & CLI</p>
+          <p class="card-desc">
+            Understand how operating systems actually manage files, folders, and network tasks. Students move past click-based interfaces and learn to talk directly to the CPU.
+          </p>
+          <ul class="card-features">
+            <li>🖥️ How operating systems work under the hood</li>
+            <li>🐚 Using the Linux terminal & shell prompts</li>
+            <li>📁 Navigating directories tree structures</li>
+            <li>🛠️ Essential Linux command lines navigation</li>
+          </ul>
+        </div>
+
+        <!-- Track 2: Coding -->
+        <div class="curriculum-card featured" style="background: radial-gradient(circle at top right, var(--bg-tertiary) 0%, var(--bg-secondary) 100%);">
+          <div class="card-level">Track 2</div>
+          <h3 class="card-title">Coding Fundamentals</h3>
+          <p class="card-meta">💡 Programming Logic & Scripting</p>
+          <p class="card-desc">
+            Learn the universal building blocks of coding. Students write clean logic sequences and scripts that store data, evaluate decisions, and automate actions.
+          </p>
+          <ul class="card-features">
+            <li>🧠 Programming logic & step-by-step thinking</li>
+            <li>📦 Variables, data storage, and math ops</li>
+            <li>🔄 Control flows: Loops and conditions</li>
+            <li>⚙️ Reusable functions and modular scripts</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Projects Section -->
+  <section class="projects-section" id="projects" style="padding: 100px 0; background: radial-gradient(circle at top, rgba(119, 33, 111, 0.03) 0%, rgba(23, 18, 20, 0) 75%); border-top: 1px solid rgba(255, 255, 255, 0.03);">
+    <div class="container">
+      <div class="section-header text-center">
+        <h2 class="section-title">Fun Projects <span class="gradient-text">They Will Build</span></h2>
+        <p class="section-subtitle">Every lesson ends with a real, working application. Kids learn by writing code and executing commands—not just watching.</p>
+      </div>
+
+      <div class="curriculum-grid">
+        <!-- Project 1 -->
+        <div class="curriculum-card">
+          <div class="card-level">Project 1</div>
+          <h3 class="card-title">🔢 Calculator</h3>
+          <p class="card-desc">
+            Build a working command-line calculator from scratch using code. Teaches basic math operators, inputs, and functional variables.
+          </p>
+        </div>
+
+        <!-- Project 2 -->
+        <div class="curriculum-card">
+          <div class="card-level">Project 2</div>
+          <h3 class="card-title">🎮 Guessing Game</h3>
+          <p class="card-desc">
+            Program a number guessing game featuring interactive hints, validation logic, user input analysis, and scoring tallies.
+          </p>
+        </div>
+
+        <!-- Project 3 -->
+        <div class="curriculum-card">
+          <div class="card-level">Project 3</div>
+          <h3 class="card-title">❓ Quiz Game</h3>
+          <p class="card-desc">
+            Create an interactive quiz console that loads multiple-choice questions, tracks performance metrics, and calculates scores.
+          </p>
+        </div>
+
+        <!-- Project 4 -->
+        <div class="curriculum-card">
+          <div class="card-level">Project 4</div>
+          <h3 class="card-title">📁 File Organizer</h3>
+          <p class="card-desc">
+            Write a real Linux shell utility that automates desktop sorting, moving files to folders based on extensions.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Parent Portal Section -->
+  <section class="parents-section" id="parents">
+    <div class="parents-bg-shape"></div>
+    <div class="container parents-container">
+      <div class="parents-visual">
+        <div class="parent-stat-box">
+          <div class="stat-progress-circle">
+            <svg viewBox="0 0 36 36" class="circular-chart">
+              <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+              <path class="circle" stroke-dasharray="90, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+            </svg>
+            <div class="percentage">90%</div>
+          </div>
+          <h4>Supercharged Confidence</h4>
+          <p>Parents report an increase in independent technical troubleshooting skills.</p>
+        </div>
+      </div>
+      
+      <div class="parents-content">
+        <h2 class="section-title">Designed for <span class="gradient-text">Students</span>,<br>Trusted by <span class="gradient-text">Parents</span></h2>
+        <p class="section-subtitle-left">
+          Linux isn't just about syntax; it's about learning computational resilience. Here's why our students' families love Junior Linux Lab:
+        </p>
+
+        <div class="parent-points">
+          <div class="point-item">
+            <div class="point-icon">🧠</div>
+            <div class="point-text">
+              <h4>System-level Problem Solving</h4>
+              <p>Linux challenges kids to think logically. Instead of drag-and-drop templates, they learn how operating systems store, run, and secure data.</p>
+            </div>
+          </div>
+
+          <div class="point-item">
+            <div class="point-icon">🛡️</div>
+            <div class="point-text">
+              <h4>100% Safe Sandbox Labs</h4>
+              <p>Students access their individual Linux systems online through their browser. No local installations or adjustments to your family computers are required.</p>
+            </div>
+          </div>
+
+          <div class="point-item">
+            <div class="point-icon">📈</div>
+            <div class="point-text">
+              <h4>Real Career Groundwork</h4>
+              <p>Over 80% of backend developer roles, cloud architecture (AWS/GCP), and modern DevOps tools require Linux. We give students a massive head start.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing and Schedule Section -->
+  <section class="pricing-section" id="pricing">
+    <div class="container">
+      <div class="section-header text-center">
+        <h2 class="section-title">Transparent <span class="gradient-text">Pricing & Batches</span></h2>
+        <p class="section-subtitle">No subscription fees or hidden costs. One complete 10–12 week program from Linux basics to real projects.</p>
+      </div>
+
+      <div class="pricing-grid single-card">
+        <div class="pricing-card featured-pricing">
+          <div class="pricing-badge">10–12 Weeks</div>
+          <div class="pricing-header">
+            <h3>Complete Linux & Coding Program</h3>
+            <div class="price-amount">₹4,999</div>
+            <p class="price-billing">One-time payment</p>
+          </div>
+          <div class="pricing-body">
+            <ul>
+              <li>✔️ 10–12 Weekly Live Lab Sessions (1.5 hrs each)</li>
+              <li>✔️ Linux CLI, scripting, and system fundamentals</li>
+              <li>✔️ Build 6+ real projects (calculator, games, file tools)</li>
+              <li>✔️ Individualized code review & mentor Discord support</li>
+              <li>✔️ Certificate of Completion</li>
+              <li>✔️ Access to sandbox terminals for 6 months</li>
+            </ul>
+            <div class="batch-times">
+              <strong>Batch Times:</strong>
+              <p>📅 Sat: 6:00 PM - 8:00 PM IST</p>
+              <p>📅 Sun: 10:00 AM - 12:00 PM IST</p>
+            </div>
+            <button class="btn btn-primary btn-full enroll-trigger" data-course="Complete Program">Enroll Now</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="faq-section" id="faq">
+    <div class="container">
+      <div class="section-header text-center">
+        <h2 class="section-title">Frequently Asked <span class="gradient-text">Questions</span></h2>
+        <p class="section-subtitle">Have questions about our syllabus, systems, or registration? Find fast answers below.</p>
+      </div>
+
+      <div class="faq-accordion-container">
+        <!-- Q1 -->
+        <div class="faq-item">
+          <button class="faq-question">
+            <span>Do we need to install Linux on our home computer?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>No! Students do not need to dual-boot, partition, or install anything on their local computers. We provide a completely secure Linux console right inside their web browser. This allows them to experiment safely without affecting your files.</p>
+          </div>
+        </div>
+
+        <!-- Q2 -->
+        <div class="faq-item">
+          <button class="faq-question">
+            <span>What are the system/hardware requirements?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>Any basic laptop, PC, Chromebook, or Mac with a standard web browser (Chrome, Firefox, Safari, or Edge) and an active internet connection is perfectly fine. Linux commands require very low system resources.</p>
+          </div>
+        </div>
+
+        <!-- Q3 -->
+        <div class="faq-item">
+          <button class="faq-question">
+            <span>My child has zero coding background. Can they start here?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>Yes, absolutely! Our Complete Linux & Coding Program is designed for beginners. We start from the basics—terminal navigation, folders, and paths—and gradually build up to scripting and real projects. No prior coding experience is required.</p>
+          </div>
+        </div>
+
+        <!-- Q4 -->
+        <div class="faq-item">
+          <button class="faq-question">
+            <span>What is the cohort size and mentorship support?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>To ensure high quality, each classroom cohort is capped at 12 students. Every live lab has one head mentor and one teaching assistant. Students can also ask questions and get debug assistance in our private, moderated Discord server throughout the week.</p>
+          </div>
+        </div>
+
+        <!-- Q5 -->
+        <div class="faq-item">
+          <button class="faq-question">
+            <span>Do you offer a money-back guarantee?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>Yes, we offer a full 100% refund up until the second class starts. If your child realizes the class doesn't match their interests or schedule, simply send us an email and we will issue a complete refund, no questions asked.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer-area">
+    <div class="container footer-container">
+      <div class="footer-brand">
+        <a href="#" class="nav-logo">
+          <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect>
+            <rect x="9" y="9" width="6" height="6"></rect>
+          </svg>
+          <span>Junior Linux Lab</span>
+        </a>
+        <p>Igniting curiosity, system logic, and coding independence in school students worldwide.</p>
+      </div>
+      <div class="footer-links-group">
+        <h4>Navigation</h4>
+        <a href="#curriculum">Curriculum</a>
+        <a href="#parents">For Parents</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#faq">FAQs</a>
+      </div>
+      <div class="footer-links-group">
+        <h4>Legal</h4>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">Safety & Moderation</a>
+      </div>
+      <div class="footer-links-group">
+        <h4>Contact Us</h4>
+        <p>📧 ericallan.daniel@gmail.com</p>
+        <p>📞 +91 7893530761</p>
+      </div>
+    </div>
+    <div class="footer-bottom text-center">
+      <p>&copy; 2026 Junior Linux Lab. All rights reserved. Linux® is the registered trademark of Linus Torvalds.</p>
+    </div>
+  </footer>
+
+  <!-- Chatbot Widget -->
+  <div class="chat-widget" id="chat-widget">
+    <!-- Chat Trigger Button (Badge is shown if chatbot is minimized and timer has run) -->
+    <button class="chat-trigger" id="chat-trigger" aria-label="Open support chat">
+      <svg class="chat-icon-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+      </svg>
+      <svg class="chat-icon-close hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+      <span class="chat-badge hidden" id="chat-badge">1</span>
+    </button>
+
+    <!-- Chat Dialog Box -->
+    <div class="chat-dialog" id="chat-dialog">
+      <div class="chat-header">
+        <div class="chat-title-container">
+          <div class="chat-avatar">🐧</div>
+          <div>
+            <h3>Tux — Linux Teacher</h3>
+            <span class="chat-status">Online • Ask me a command</span>
+          </div>
+        </div>
+        <button class="chat-close-btn" id="chat-close-btn" aria-label="Minimize chat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      
+      <div class="chat-messages" id="chat-messages">
+        <!-- Message list -->
+      </div>
+      
+      <div class="chat-suggestions" id="chat-suggestions">
+        <button class="suggestion-btn" data-query="what does chmod do">🐧 What is chmod?</button>
+        <button class="suggestion-btn" data-query="curriculum">📚 Syllabus</button>
+        <button class="suggestion-btn" data-query="pricing">💰 Pricing</button>
+        <button class="suggestion-btn" data-query="schedule">📅 Class times</button>
+        <button class="suggestion-btn" data-query="parents">🛡️ For Parents</button>
+        <button class="suggestion-btn" data-query="what can you do">🤖 What can you do?</button>
+      </div>
+
+      <form class="chat-input-area" id="chat-input-form">
+        <input type="text" id="chat-input" placeholder="Ask a Linux command, about classes, or anything..." autocomplete="off">
+        <button type="submit" class="chat-send-btn" id="chat-send-btn" aria-label="Send message">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Registration Modal -->
+  <div class="modal" id="enroll-modal">
+    <div class="modal-content">
+      <button class="modal-close" id="modal-close">&times;</button>
+      <h3 class="modal-title">Enroll at Junior Linux Lab</h3>
+      <p class="modal-subtitle">Register for our 10–12 week Complete Linux & Coding Program. No credit card required to secure a spot!</p>
+      
+      <form id="enroll-form" class="modal-form">
+        <input type="hidden" id="enroll-course-select" value="Complete Program">
+        <div class="form-group">
+          <label for="enroll-parent-name">Parent's Full Name</label>
+          <input type="text" id="enroll-parent-name" required placeholder="John Doe">
+        </div>
+        <div class="form-group">
+          <label for="enroll-email">Email Address</label>
+          <input type="email" id="enroll-email" required placeholder="john@example.com">
+        </div>
+        <div class="form-group">
+          <label for="enroll-student-age">Student's Age</label>
+          <input type="number" id="enroll-student-age" required min="8" max="20" placeholder="12">
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Secure Spot</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Login Modal -->
+  <div class="modal" id="login-modal">
+    <div class="modal-content">
+      <button class="modal-close" id="login-modal-close">&times;</button>
+      <h3 class="modal-title">Log In</h3>
+      <p class="modal-subtitle">Access your student dashboard or the teacher portal.</p>
+
+      <div class="portal-tabs" id="login-tabs">
+        <button type="button" class="portal-tab-btn active" data-role="student">🎓 Student</button>
+        <button type="button" class="portal-tab-btn" data-role="teacher">🧑‍🏫 Teacher</button>
+      </div>
+
+      <form id="login-form" class="modal-form">
+        <div class="form-group">
+          <label for="login-id">Student ID (your email)</label>
+          <input type="text" id="login-id" required placeholder="you@example.com" autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label for="login-password">Password</label>
+          <input type="password" id="login-password" required placeholder="••••••••" autocomplete="current-password">
+        </div>
+        <p class="portal-error hidden" id="login-error"></p>
+        <button type="submit" class="btn btn-primary btn-full">Log In</button>
+      </form>
+      <p class="portal-hint" id="login-hint">New students: your login is created automatically when you enroll — check the confirmation popup (and your email) for your password.</p>
+    </div>
+  </div>
+
+  <!-- Student Dashboard Modal -->
+  <div class="modal" id="student-dashboard-modal">
+    <div class="modal-content dashboard-content">
+      <button class="modal-close" id="student-dashboard-close">&times;</button>
+      <h3 class="modal-title">My Dashboard</h3>
+      <div id="student-dashboard-body"><!-- populated by portal.js --></div>
+      <button class="btn btn-secondary btn-full" id="student-logout-btn">Log Out</button>
+    </div>
+  </div>
+
+  <!-- Teacher Dashboard Modal -->
+  <div class="modal" id="teacher-dashboard-modal">
+    <div class="modal-content dashboard-content dashboard-content-wide">
+      <button class="modal-close" id="teacher-dashboard-close">&times;</button>
+      <h3 class="modal-title">Teacher Portal</h3>
+
+      <div class="portal-tabs" id="teacher-tabs">
+        <button type="button" class="portal-tab-btn active" data-tab="progress">📋 Class Progress</button>
+        <button type="button" class="portal-tab-btn" data-tab="students">🧑‍🎓 Enrolled Students</button>
+        <button type="button" class="portal-tab-btn" data-tab="fees">💰 Pending Fees</button>
+      </div>
+
+      <div id="teacher-tab-progress" class="teacher-tab-panel"></div>
+      <div id="teacher-tab-students" class="teacher-tab-panel hidden"></div>
+      <div id="teacher-tab-fees" class="teacher-tab-panel hidden"></div>
+
+      <button class="btn btn-secondary btn-full" id="teacher-logout-btn">Log Out</button>
+    </div>
+  </div>
+
+  <!-- Javascript Scripts -->
+  <!-- EmailJS: sends the enrollment confirmation email from the browser (no backend needed). -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script src="portal.js"></script>
+  <script src="app.js"></script>
+  <script src="chatbot.js"></script>
+</body>
+</html>
