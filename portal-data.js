@@ -148,6 +148,11 @@ function updateStudentDetails(originalStudentId, { parentName, studentName, emai
   return student;
 }
 
+function usernameFromName(name) {
+  const cleaned = String(name || '').trim().replace(/\s+/g, '').replace(/[^a-zA-Z0-9_.-]/g, '').slice(0, 24);
+  return cleaned || 'guest';
+}
+
 function escapeHtml(text) {
   const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
   return String(text).replace(/[&<>"']/g, m => map[m]);
@@ -179,6 +184,7 @@ window.JLLPortal = {
   setSession,
   clearSession,
   escapeHtml,
+  usernameFromName,
   MENTOR_CREDENTIALS,
   MENTOR_TERMINAL_USERNAME,
   SYLLABUS_TEMPLATE

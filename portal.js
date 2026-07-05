@@ -9,7 +9,7 @@ function initPortal() {
   const {
     loadStudents, saveStudents, updateStudentDetails, loadSyllabusProgress, saveSyllabusProgress,
     sendEnrollmentEmail, initEmailJS, getSession, setSession, clearSession,
-    escapeHtml, MENTOR_CREDENTIALS, MENTOR_TERMINAL_USERNAME
+    escapeHtml, usernameFromName, MENTOR_CREDENTIALS, MENTOR_TERMINAL_USERNAME
   } = window.JLLPortal;
 
   initEmailJS();
@@ -141,6 +141,7 @@ function initPortal() {
       return;
     }
     panel.innerHTML =
+      '<p class="portal-hint" style="margin-top:0; text-align:left;">👁️ Watch opens a live, read/write mirror of a student\'s terminal — best-effort only, and only works while that student currently has their terminal tab open.</p>' +
       '<table class="portal-table"><thead><tr><th>Student</th><th>Parent</th><th>Age</th><th>Email</th><th>Enrolled</th><th>Fee</th><th></th></tr></thead><tbody>' +
       students.map(s =>
         '<tr data-row-id="' + escapeHtml(s.studentId) + '">' +
@@ -150,13 +151,22 @@ function initPortal() {
           '<td class="cell-email">' + escapeHtml(s.studentId) + '</td>' +
           '<td>' + new Date(s.enrolledAt).toLocaleDateString() + '</td>' +
           '<td>' + (s.feeStatus === 'paid' ? '<span class="fee-badge paid">Paid</span>' : '<span class="fee-badge pending">Pending</span>') + '</td>' +
-          '<td><button class="btn btn-secondary btn-sm edit-student-btn" data-id="' + escapeHtml(s.studentId) + '">Edit</button></td>' +
+          '<td>' +
+            '<button class="btn btn-secondary btn-sm edit-student-btn" data-id="' + escapeHtml(s.studentId) + '">Edit</button> ' +
+            '<button class="btn btn-secondary btn-sm watch-student-btn" data-username="' + escapeHtml(usernameFromName(s.studentName || s.parentName)) + '">👁️ Watch</button>' +
+          '</td>' +
         '</tr>'
       ).join('') +
       '</tbody></table>';
 
     panel.querySelectorAll('.edit-student-btn').forEach(btn => {
       btn.addEventListener('click', () => startEditStudentRow(btn.getAttribute('data-id')));
+    });
+    panel.querySelectorAll('.watch-student-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetUsername = btn.getAttribute('data-username');
+        window.open('https://dericallan.github.io/browser-linux-terminal/?watch=' + encodeURIComponent(targetUsername), '_blank', 'noopener,noreferrer');
+      });
     });
   }
 

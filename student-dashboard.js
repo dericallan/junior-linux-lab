@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', initStudentDashboard);
 function initStudentDashboard() {
   const {
     loadStudents, saveStudents, sendEnrollmentEmail, initEmailJS,
-    getSession, clearSession, escapeHtml, loadSyllabusProgress
+    getSession, clearSession, escapeHtml, loadSyllabusProgress, usernameFromName
   } = window.JLLPortal;
 
   initEmailJS();
@@ -32,12 +32,7 @@ function initStudentDashboard() {
   let terminalTabs = []; // { id, label }
   let terminalCounter = 0;
 
-  function usernameFromStudentName(name) {
-    const cleaned = String(name || '').trim().replace(/\s+/g, '').replace(/[^a-zA-Z0-9_.-]/g, '').slice(0, 24);
-    return cleaned || 'guest';
-  }
-
-  const terminalUsername = usernameFromStudentName(student.studentName || student.parentName);
+  const terminalUsername = usernameFromName(student.studentName || student.parentName);
 
   document.getElementById('dashboard-student-name').textContent = student.studentName || student.parentName;
 
@@ -195,7 +190,9 @@ function initStudentDashboard() {
       return;
     }
     terminalCounter++;
-    const tab = { id: 'term-' + terminalCounter, label: 'Terminal ' + terminalCounter };
+    // Only the first tab is watchable by a mentor, so there's one predictable
+    // session to mirror per student (avoids peer-ID collisions across tabs).
+    const tab = { id: 'term-' + terminalCounter, label: 'Terminal ' + terminalCounter, watchable: terminalCounter === 1 };
     terminalTabs.push(tab);
     redrawTerminalTabs(tab.id);
   }
@@ -237,7 +234,7 @@ function initStudentDashboard() {
         const iframe = document.createElement('iframe');
         iframe.id = t.id;
         iframe.className = 'terminal-iframe';
-        iframe.src = TERMINAL_BASE_URL + '?user=' + encodeURIComponent(terminalUsername);
+        iframe.src = TERMINAL_BASE_URL + '?user=' + encodeURIComponent(terminalUsername) + (t.watchable ? '&watchable=1' : '');
         iframe.title = t.label;
         iframe.allow = 'fullscreen';
         iframe.setAttribute('allowfullscreen', 'true');
