@@ -38,6 +38,17 @@ function initChatbot() {
 
   let hasPoppedUp = false;
   let isChatOpen = false;
+  let inactivityTimer = null;
+  const INACTIVITY_TIMEOUT = 60000; // auto-hide after 60s of no activity
+
+  function resetInactivityTimer() {
+    if (inactivityTimer) clearTimeout(inactivityTimer);
+    if (isChatOpen) {
+      inactivityTimer = setTimeout(() => {
+        closeChat();
+      }, INACTIVITY_TIMEOUT);
+    }
+  }
 
   // 1. Initial greeting message
   const welcomeText = "Hi there! 👋 I'm Tux, your Linux teacher bot. Ask me about any Linux command, our classes, or really anything at all — I'll search the web if I don't know something.";
@@ -81,6 +92,7 @@ function initChatbot() {
     const rawText = input.value.trim();
     if (rawText === '') return;
 
+    resetInactivityTimer();
     input.value = '';
     showUserMessage(rawText);
 
@@ -93,9 +105,13 @@ function initChatbot() {
     }, 500 + Math.random() * 500); // Natural delay
   });
 
+  // Any typing in the input also counts as activity
+  input.addEventListener('input', resetInactivityTimer);
+
   // Suggestion buttons click
   document.querySelectorAll('.suggestion-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
+      resetInactivityTimer();
       const query = e.target.getAttribute('data-query');
       const text = e.target.innerText;
       showUserMessage(text);
@@ -113,12 +129,17 @@ function initChatbot() {
     trigger.classList.add('open');
     isChatOpen = true;
     input.focus();
+    resetInactivityTimer();
   }
 
   function closeChat() {
     dialog.classList.remove('open');
     trigger.classList.remove('open');
     isChatOpen = false;
+    if (inactivityTimer) {
+      clearTimeout(inactivityTimer);
+      inactivityTimer = null;
+    }
   }
 
   function showUserMessage(text) {
@@ -146,6 +167,7 @@ function initChatbot() {
         linkBtn.className = 'chat-link-btn' + (act.action === 'websearch' ? ' web-search' : '');
         linkBtn.innerText = act.label;
         linkBtn.addEventListener('click', () => {
+          resetInactivityTimer();
           handleAction(act.action, act.target);
         });
         btnContainer.appendChild(linkBtn);

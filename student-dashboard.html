@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Dashboard - Junior Linux Lab</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Ubuntu+Mono:wght@400;700&family=Red+Hat+Text:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="dashboard-page-body">
+
+  <div class="dashboard-page" id="dashboard-page">
+    <header class="dashboard-page-header">
+      <a href="index.html" class="nav-logo">
+        <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect>
+          <rect x="9" y="9" width="6" height="6"></rect>
+        </svg>
+        <span>Junior Linux Lab</span>
+      </a>
+      <div class="dashboard-page-header-right">
+        <span class="dashboard-page-student-name" id="dashboard-student-name"></span>
+        <button class="btn btn-secondary btn-sm" id="dashboard-logout-btn">Log Out</button>
+      </div>
+    </header>
+
+    <nav class="portal-tabs dashboard-page-tabs" id="student-tabs">
+      <button type="button" class="portal-tab-btn active" data-tab="overview">🏠 Overview</button>
+      <button type="button" class="portal-tab-btn" data-tab="projects">📁 Projects</button>
+      <button type="button" class="portal-tab-btn" data-tab="notes">📝 Notes</button>
+      <button type="button" class="portal-tab-btn" data-tab="terminal">🖥️ Terminal</button>
+    </nav>
+
+    <main class="dashboard-page-content">
+      <div id="student-tab-overview" class="student-tab-panel"></div>
+      <div id="student-tab-projects" class="student-tab-panel hidden"></div>
+      <div id="student-tab-notes" class="student-tab-panel hidden"></div>
+      <div id="student-tab-terminal" class="student-tab-panel hidden"></div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js" async></script>
+  <script src="portal-data.js"></script>
+  <script src="student-dashboard.js"></script>
+</body>
+</html>

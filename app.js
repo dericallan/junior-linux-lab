@@ -468,6 +468,7 @@ function initEnrollModal() {
       e.preventDefault();
       
       const parentName = document.getElementById('enroll-parent-name').value;
+      const studentName = document.getElementById('enroll-student-name').value;
       const email = document.getElementById('enroll-email').value;
       const studentAge = document.getElementById('enroll-student-age').value;
       const selectedCourse = courseSelect.value === 'Complete Program'
@@ -478,6 +479,7 @@ function initEnrollModal() {
       if (window.JLLPortal) {
         student = window.JLLPortal.registerStudent({
           parentName,
+          studentName,
           email,
           age: studentAge,
           course: 'Complete Linux & Coding Program'
@@ -486,6 +488,7 @@ function initEnrollModal() {
         window.JLLPortal.sendEnrollmentEmail({
           to_email: email,
           parent_name: parentName,
+          student_name: studentName,
           student_age: studentAge,
           course_name: 'Complete Linux & Coding Program',
           price: '₹4,999',

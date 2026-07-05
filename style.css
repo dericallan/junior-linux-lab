@@ -1498,6 +1498,54 @@ a {
   max-width: 800px;
 }
 
+/* Full-page student dashboard (student-dashboard.html) */
+.dashboard-page-body {
+  min-height: 100vh;
+  padding: 0;
+}
+
+.dashboard-page {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 32px;
+  background: var(--bg-glass);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-glass);
+}
+
+.dashboard-page-header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.dashboard-page-student-name {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.dashboard-page-tabs {
+  padding: 16px 32px 0;
+  margin-bottom: 0;
+}
+
+.dashboard-page-content {
+  flex: 1;
+  padding: 24px 32px 48px;
+  max-width: 900px;
+  width: 100%;
+  margin: 0 auto;
+}
+
 .dashboard-welcome {
   font-size: 1.1rem;
   margin-bottom: 20px;

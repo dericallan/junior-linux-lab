@@ -504,6 +504,10 @@
           <input type="text" id="enroll-parent-name" required placeholder="John Doe">
         </div>
         <div class="form-group">
+          <label for="enroll-student-name">Student's Full Name</label>
+          <input type="text" id="enroll-student-name" required placeholder="Alex Doe">
+        </div>
+        <div class="form-group">
           <label for="enroll-email">Email Address</label>
           <input type="email" id="enroll-email" required placeholder="john@example.com">
         </div>
@@ -544,28 +548,6 @@
     </div>
   </div>
 
-  <!-- Student Dashboard Modal -->
-  <div class="modal" id="student-dashboard-modal">
-    <div class="modal-content dashboard-content dashboard-content-wide">
-      <button class="modal-close" id="student-dashboard-close">&times;</button>
-      <h3 class="modal-title">My Dashboard</h3>
-
-      <div class="portal-tabs" id="student-tabs">
-        <button type="button" class="portal-tab-btn active" data-tab="overview">🏠 Overview</button>
-        <button type="button" class="portal-tab-btn" data-tab="projects">📁 Projects</button>
-        <button type="button" class="portal-tab-btn" data-tab="notes">📝 Notes</button>
-        <button type="button" class="portal-tab-btn" data-tab="terminal">🖥️ Terminal</button>
-      </div>
-
-      <div id="student-tab-overview" class="student-tab-panel"></div>
-      <div id="student-tab-projects" class="student-tab-panel hidden"></div>
-      <div id="student-tab-notes" class="student-tab-panel hidden"></div>
-      <div id="student-tab-terminal" class="student-tab-panel hidden"></div>
-
-      <button class="btn btn-secondary btn-full" id="student-logout-btn">Log Out</button>
-    </div>
-  </div>
-
   <!-- Teacher Dashboard Modal -->
   <div class="modal" id="teacher-dashboard-modal">
     <div class="modal-content dashboard-content dashboard-content-wide">
@@ -596,15 +578,20 @@
     document.getElementById('login-nav-btn').addEventListener('click', function () {
       var session = null;
       try { session = JSON.parse(sessionStorage.getItem('jll_session') || 'null'); } catch (e) {}
-      if (!session) {
+      if (session && session.role === 'student') {
+        window.location.href = 'student-dashboard.html';
+      } else if (!session) {
         document.getElementById('login-modal').classList.add('open');
       }
+      // Teacher session: handled by portal.js's own listener once it loads,
+      // since opening the teacher portal needs its render functions.
     });
   </script>
 
   <!-- Javascript Scripts -->
   <!-- EmailJS: sends the enrollment confirmation email from the browser (no backend needed). -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js" async></script>
+  <script src="portal-data.js"></script>
   <script src="portal.js"></script>
   <script src="app.js"></script>
   <script src="chatbot.js"></script>
