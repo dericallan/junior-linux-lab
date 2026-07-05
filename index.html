@@ -546,10 +546,22 @@
 
   <!-- Student Dashboard Modal -->
   <div class="modal" id="student-dashboard-modal">
-    <div class="modal-content dashboard-content">
+    <div class="modal-content dashboard-content dashboard-content-wide">
       <button class="modal-close" id="student-dashboard-close">&times;</button>
       <h3 class="modal-title">My Dashboard</h3>
-      <div id="student-dashboard-body"><!-- populated by portal.js --></div>
+
+      <div class="portal-tabs" id="student-tabs">
+        <button type="button" class="portal-tab-btn active" data-tab="overview">🏠 Overview</button>
+        <button type="button" class="portal-tab-btn" data-tab="projects">📁 Projects</button>
+        <button type="button" class="portal-tab-btn" data-tab="notes">📝 Notes</button>
+        <button type="button" class="portal-tab-btn" data-tab="terminal">🖥️ Terminal</button>
+      </div>
+
+      <div id="student-tab-overview" class="student-tab-panel"></div>
+      <div id="student-tab-projects" class="student-tab-panel hidden"></div>
+      <div id="student-tab-notes" class="student-tab-panel hidden"></div>
+      <div id="student-tab-terminal" class="student-tab-panel hidden"></div>
+
       <button class="btn btn-secondary btn-full" id="student-logout-btn">Log Out</button>
     </div>
   </div>

@@ -1634,6 +1634,91 @@ a {
   min-height: 120px;
 }
 
+.student-tab-panel {
+  margin-bottom: 20px;
+  min-height: 120px;
+}
+
+/* Terminal tabs inside the student dashboard */
+.terminal-tabs-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.terminal-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text-muted);
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.terminal-tab-btn.active {
+  background: rgba(233, 84, 32, 0.12);
+  border-color: var(--accent-cyan);
+  color: var(--text-main);
+}
+
+.terminal-tab-close {
+  font-size: 0.95rem;
+  line-height: 1;
+  color: var(--text-muted);
+  padding: 0 2px;
+}
+
+.terminal-tab-close:hover {
+  color: var(--accent-pink);
+}
+
+.terminal-tab-add {
+  background: rgba(233, 84, 32, 0.08);
+  border: 1px dashed rgba(233, 84, 32, 0.3);
+  color: var(--accent-cyan);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.terminal-tab-add:hover {
+  background: rgba(233, 84, 32, 0.15);
+}
+
+.terminal-panels {
+  position: relative;
+  width: 100%;
+  height: 420px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #010409;
+}
+
+.terminal-iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: none;
+}
+
+.terminal-iframe.active-terminal-panel {
+  display: block;
+}
+
 /* Responsive Styles */
 @media (max-width: 1024px) {
   .hero-title {
