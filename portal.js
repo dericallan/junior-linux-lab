@@ -23,12 +23,30 @@ function initEmailJS() {
   const configured = !!EMAILJS_PUBLIC_KEY && !!EMAILJS_SERVICE_ID && !!EMAILJS_TEMPLATE_ID
     && !/^YOUR_/.test(EMAILJS_PUBLIC_KEY) && !/^YOUR_/.test(EMAILJS_SERVICE_ID) && !/^YOUR_/.test(EMAILJS_TEMPLATE_ID);
 
-  if (window.emailjs && configured) {
-    window.emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
-    emailjsReady = true;
-  } else {
+  if (!configured) {
     console.warn('[Junior Linux Lab] EmailJS is not configured yet — enrollment emails will be skipped. See EMAILJS_* constants at the top of portal.js.');
+    return;
   }
+
+  // The EmailJS SDK loads via an async <script> tag so it never blocks the
+  // rest of the page (including the login button) from becoming interactive.
+  // That means it may not have finished loading yet when this runs, so poll
+  // briefly instead of giving up immediately.
+  let attempts = 0;
+  const tryInit = () => {
+    if (window.emailjs) {
+      window.emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+      emailjsReady = true;
+      return;
+    }
+    attempts++;
+    if (attempts < 25) {
+      setTimeout(tryInit, 200);
+    } else {
+      console.warn('[Junior Linux Lab] EmailJS SDK never finished loading — enrollment emails will be skipped for this page load.');
+    }
+  };
+  tryInit();
 }
 
 function sendEnrollmentEmail(details) {
