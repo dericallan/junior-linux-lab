@@ -586,6 +586,22 @@
     </div>
   </div>
 
+  <!-- Instant fallback: opens the login modal on first click even if portal.js
+       hasn't finished loading yet. Inline, so there's no network round-trip —
+       it runs the moment the parser reaches it. Only handles the "not logged
+       in yet" case (the common one for a fresh page load); if a session
+       already exists, portal.js's own listener — which is what renders the
+       actual dashboard content — takes over once it's loaded. -->
+  <script>
+    document.getElementById('login-nav-btn').addEventListener('click', function () {
+      var session = null;
+      try { session = JSON.parse(sessionStorage.getItem('jll_session') || 'null'); } catch (e) {}
+      if (!session) {
+        document.getElementById('login-modal').classList.add('open');
+      }
+    });
+  </script>
+
   <!-- Javascript Scripts -->
   <!-- EmailJS: sends the enrollment confirmation email from the browser (no backend needed). -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js" async></script>
