@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', initStudentDashboard);
 function initStudentDashboard() {
   const {
     loadStudents, saveStudents, sendEnrollmentEmail, initEmailJS,
-    getSession, clearSession, escapeHtml, SYLLABUS_TEMPLATE
+    getSession, clearSession, escapeHtml, loadSyllabusProgress
   } = window.JLLPortal;
 
   initEmailJS();
@@ -73,7 +73,7 @@ function initStudentDashboard() {
             '<p class="portal-hint" id="password-success" style="display:none; color: var(--accent-green); margin-top:0;">Password updated!</p>' +
             '<button type="submit" class="btn btn-primary" style="align-self:flex-start;">Update Password</button>' +
           '</form>'
-        : '<p class="portal-hint" style="margin-top:0; text-align:left;">Password changes unlock once your course fee is marked as paid by your teacher. Your fee status is shown above.</p>'
+        : '<p class="portal-hint" style="margin-top:0; text-align:left;">Password changes unlock once your course fee is marked as paid by your mentor. Your fee status is shown above.</p>'
       );
 
     const pwForm = document.getElementById('change-password-form');
@@ -104,8 +104,17 @@ function initStudentDashboard() {
     }
   }
 
+  /* ---------------- Fee-gated feature lock ---------------- */
+  function renderLocked(panelId, featureName) {
+    const panel = document.getElementById(panelId);
+    panel.innerHTML =
+      '<p class="portal-hint" style="margin-top:0; text-align:left;">🔒 ' + escapeHtml(featureName) +
+      ' unlocks once your course fee is marked as paid by your mentor. Check the Overview tab for your current fee status.</p>';
+  }
+
   /* ---------------- Projects ---------------- */
   function renderProjects() {
+    if (student.feeStatus !== 'paid') { renderLocked('student-tab-projects', 'Projects'); return; }
     const panel = document.getElementById('student-tab-projects');
     panel.innerHTML = '<ul class="portal-list" id="student-projects-list"></ul>';
     const projectsList = document.getElementById('student-projects-list');
@@ -138,15 +147,20 @@ function initStudentDashboard() {
 
   /* ---------------- Notes ---------------- */
   function renderNotes() {
+    if (student.feeStatus !== 'paid') { renderLocked('student-tab-notes', 'Notes'); return; }
     const panel = document.getElementById('student-tab-notes');
+    // Reads the live, mentor-editable syllabus data (not a static template) so
+    // any topic edits made in the Mentor Portal show up here immediately.
+    const syllabus = loadSyllabusProgress();
     panel.innerHTML =
       '<ul class="portal-list">' +
-        SYLLABUS_TEMPLATE.map(w => '<li><strong>Week ' + w.week + ':</strong> ' + escapeHtml(w.topic) + '</li>').join('') +
+        syllabus.map(w => '<li><strong>Week ' + w.week + ':</strong> ' + escapeHtml(w.topic) + '</li>').join('') +
       '</ul>';
   }
 
   /* ---------------- Terminal ---------------- */
   function renderTerminal() {
+    if (student.feeStatus !== 'paid') { renderLocked('student-tab-terminal', 'The terminal'); return; }
     const panel = document.getElementById('student-tab-terminal');
     panel.innerHTML =
       '<p class="portal-hint" style="margin-top:0; text-align:left;">Logged in as <code>' + escapeHtml(terminalUsername) + '@terminal</code>. Each tab is its own independent Linux session — state resets if you close or restart it.</p>' +

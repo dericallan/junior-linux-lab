@@ -43,7 +43,7 @@
       </nav>
 
       <div class="nav-actions">
-        <button class="btn btn-secondary btn-sm login-nav-btn" id="login-nav-btn" aria-label="Student or teacher login">
+        <button class="btn btn-secondary btn-sm login-nav-btn" id="login-nav-btn" aria-label="Student or mentor login">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
             <circle cx="12" cy="7" r="4"></circle>
@@ -292,8 +292,9 @@
     </div>
   </section>
 
-  <!-- Pricing and Schedule Section -->
-  <section class="pricing-section" id="pricing">
+  <!-- Pricing and Schedule Section: hidden until "Schedule & Pricing" (or
+       any link to #pricing) is clicked — see the reveal logic in app.js. -->
+  <section class="pricing-section hidden" id="pricing">
     <div class="container">
       <div class="section-header text-center">
         <h2 class="section-title">Transparent <span class="gradient-text">Pricing & Batches</span></h2>
@@ -525,11 +526,11 @@
     <div class="modal-content">
       <button class="modal-close" id="login-modal-close">&times;</button>
       <h3 class="modal-title">Log In</h3>
-      <p class="modal-subtitle">Access your student dashboard or the teacher portal.</p>
+      <p class="modal-subtitle">Access your student dashboard or the mentor portal.</p>
 
       <div class="portal-tabs" id="login-tabs">
         <button type="button" class="portal-tab-btn active" data-role="student">🎓 Student</button>
-        <button type="button" class="portal-tab-btn" data-role="teacher">🧑‍🏫 Teacher</button>
+        <button type="button" class="portal-tab-btn" data-role="mentor">🧑‍🏫 Mentor</button>
       </div>
 
       <form id="login-form" class="modal-form">
@@ -548,21 +549,23 @@
     </div>
   </div>
 
-  <!-- Teacher Dashboard Modal -->
+  <!-- Mentor Dashboard Modal -->
   <div class="modal" id="teacher-dashboard-modal">
     <div class="modal-content dashboard-content dashboard-content-wide">
       <button class="modal-close" id="teacher-dashboard-close">&times;</button>
-      <h3 class="modal-title">Teacher Portal</h3>
+      <h3 class="modal-title">Mentor Portal</h3>
 
       <div class="portal-tabs" id="teacher-tabs">
         <button type="button" class="portal-tab-btn active" data-tab="progress">📋 Class Progress</button>
         <button type="button" class="portal-tab-btn" data-tab="students">🧑‍🎓 Enrolled Students</button>
         <button type="button" class="portal-tab-btn" data-tab="fees">💰 Pending Fees</button>
+        <button type="button" class="portal-tab-btn" data-tab="terminal">🖥️ Terminal</button>
       </div>
 
       <div id="teacher-tab-progress" class="teacher-tab-panel"></div>
       <div id="teacher-tab-students" class="teacher-tab-panel hidden"></div>
       <div id="teacher-tab-fees" class="teacher-tab-panel hidden"></div>
+      <div id="teacher-tab-terminal" class="teacher-tab-panel hidden"></div>
 
       <button class="btn btn-secondary btn-full" id="teacher-logout-btn">Log Out</button>
     </div>
@@ -583,8 +586,8 @@
       } else if (!session) {
         document.getElementById('login-modal').classList.add('open');
       }
-      // Teacher session: handled by portal.js's own listener once it loads,
-      // since opening the teacher portal needs its render functions.
+      // Mentor session: handled by portal.js's own listener once it loads,
+      // since opening the mentor portal needs its render functions.
     });
   </script>
 

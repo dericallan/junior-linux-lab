@@ -5,7 +5,26 @@ document.addEventListener('DOMContentLoaded', () => {
   initFAQAccordion();
   initTerminal();
   initEnrollModal();
+  initPricingReveal();
 });
+
+/* ==========================================================================
+   Pricing Section Reveal
+   Fee details are hidden while casually scrolling the page — they only
+   appear once a visitor deliberately clicks a link to "Schedule & Pricing"
+   (or any other link pointing at #pricing, like the nav Enroll button or
+   the footer link).
+   ========================================================================== */
+function initPricingReveal() {
+  const pricingSection = document.getElementById('pricing');
+  if (!pricingSection) return;
+
+  document.querySelectorAll('a[href="#pricing"]').forEach(link => {
+    link.addEventListener('click', () => {
+      pricingSection.classList.remove('hidden');
+    });
+  });
+}
 
 /* ==========================================================================
    Mobile Menu Toggle
@@ -210,6 +229,100 @@ echo "Sign up at Junior Linux Lab to learn how to write real shell scripts!"`
     }
   }
 
+  // --- Futuristic games ---
+  const HACK_STAGES = [
+    { cmd: 'bypass firewall', success: '✅ Firewall signature spoofed. Layer 1 breached.' },
+    { cmd: 'crack password', success: '✅ Brute-force complete. Layer 2 breached.' },
+    { cmd: 'download files', success: '✅ Data exfiltrated. Layer 3 breached.' }
+  ];
+
+  function startHackGame() {
+    activeGame = { name: 'hack', stage: 0 };
+    return [
+      '🛰️ <span class="terminal-highlight">MAINFRAME BREACH</span> — connecting to CorpNet-9...',
+      'Breach all 3 security layers by typing the exact command shown.',
+      '',
+      `[Layer 1/3] Type: <span class="terminal-highlight">${HACK_STAGES[0].cmd}</span> (or "exit")`
+    ];
+  }
+
+  function handleHackInput(line) {
+    if (/^(exit|quit)$/i.test(line)) {
+      activeGame = null;
+      return ['Connection terminated.'];
+    }
+    const stage = HACK_STAGES[activeGame.stage];
+    if (line.trim().toLowerCase() !== stage.cmd) {
+      return [`Command not recognized. Try: <span class="terminal-highlight">${stage.cmd}</span> (or "exit").`];
+    }
+    activeGame.stage++;
+    if (activeGame.stage >= HACK_STAGES.length) {
+      activeGame = null;
+      return [stage.success, '', '🏆 ACCESS GRANTED — mainframe breached!', '(All simulated, obviously — real hacking without permission is illegal.)'];
+    }
+    const next = HACK_STAGES[activeGame.stage];
+    return [stage.success, '', `[Layer ${activeGame.stage + 1}/3] Type: <span class="terminal-highlight">${next.cmd}</span>`];
+  }
+
+  function caesarShift(str, shift) {
+    return str.replace(/[a-zA-Z]/g, (c) => {
+      const base = c === c.toUpperCase() ? 65 : 97;
+      return String.fromCharCode(((c.charCodeAt(0) - base + shift) % 26 + 26) % 26 + base);
+    });
+  }
+
+  function startCipherGame() {
+    activeGame = { name: 'cipher', step: 'message' };
+    return ['🔐 <span class="terminal-highlight">Cipher Machine</span> — encode a secret message with a Caesar shift.', 'Type the message you want to encode (or "exit"):'];
+  }
+
+  function handleCipherInput(line) {
+    if (/^(exit|quit)$/i.test(line)) {
+      activeGame = null;
+      return ['Cipher machine powered down.'];
+    }
+    if (activeGame.step === 'message') {
+      activeGame.message = line;
+      activeGame.step = 'shift';
+      return ['Now enter a shift number (1-25):'];
+    }
+    const shift = parseInt(line, 10);
+    if (isNaN(shift) || shift < 1 || shift > 25) {
+      return ['Please enter a whole number between 1 and 25 (or "exit").'];
+    }
+    const message = activeGame.message;
+    const encoded = caesarShift(message, shift);
+    const decoded = caesarShift(encoded, 26 - shift);
+    activeGame = null;
+    return [
+      `Encoded (shift ${shift}): ${encoded}`,
+      `Decoded back: ${decoded}`,
+      'Type "cipher" to encode another message.'
+    ];
+  }
+
+  function runMatrixEffect() {
+    const chars = 'アイウエオカキクケコ0123456789ABCDEFXYZ$#@%&';
+    let frame = 0;
+    const totalFrames = 10;
+    function renderFrame() {
+      if (frame >= totalFrames) {
+        appendLine('<span class="terminal-highlight">Wake up, Neo...</span>', 'stdout');
+        terminalBody.scrollTop = terminalBody.scrollHeight;
+        return;
+      }
+      let line = '';
+      for (let i = 0; i < 50; i++) {
+        line += Math.random() < 0.15 ? chars[Math.floor(Math.random() * chars.length)] : '&nbsp;';
+      }
+      appendLine('<span style="color:#00ff41; font-weight:bold;">' + line + '</span>', 'stdout');
+      terminalBody.scrollTop = terminalBody.scrollHeight;
+      frame++;
+      setTimeout(renderFrame, 120);
+    }
+    renderFrame();
+  }
+
   // Commands registry
   const commands = {
     'help': () => {
@@ -225,6 +338,9 @@ echo "Sign up at Junior Linux Lab to learn how to write real shell scripts!"`
         '  <span class="terminal-highlight">guess</span>            Play the number guessing game',
         '  <span class="terminal-highlight">quiz</span>             Play the Linux trivia quiz',
         '  <span class="terminal-highlight">calculator</span>       Open the interactive calculator',
+        '  <span class="terminal-highlight">hack</span>             Play the Mainframe Breach hacking sim',
+        '  <span class="terminal-highlight">cipher</span>           Encode/decode a message with a Caesar cipher',
+        '  <span class="terminal-highlight">matrix</span>           Enter the Matrix (digital rain effect)',
         '  <span class="terminal-highlight">clear</span>            Clear terminal output',
         '  <span class="terminal-highlight">sudo &lt;command&gt;</span>   Execute a command with root privileges',
         '  <span class="terminal-highlight">enroll</span>           Open registration portal'
@@ -237,6 +353,9 @@ echo "Sign up at Junior Linux Lab to learn how to write real shell scripts!"`
         '  <span class="terminal-highlight">quiz</span>        ❓ Linux Quiz — 5 multiple-choice questions',
         '  <span class="terminal-highlight">calculator</span>  🔢 Calculator — evaluate any expression',
         '  <span class="terminal-highlight">organize</span>    📁 File Organizer — sorts a messy Downloads folder',
+        '  <span class="terminal-highlight">hack</span>        🛰️ Mainframe Breach — a futuristic hacking sim',
+        '  <span class="terminal-highlight">cipher</span>      🔐 Cipher Machine — Caesar-encode a secret message',
+        '  <span class="terminal-highlight">matrix</span>      🟢 Enter the Matrix — digital rain effect',
         'Type any of these to start!'
       ];
     },
@@ -251,6 +370,18 @@ echo "Sign up at Junior Linux Lab to learn how to write real shell scripts!"`
     'calculator': () => {
       if (activeGame) return ['A game is already running. Type "exit" to quit it first.'];
       return startCalcGame();
+    },
+    'hack': () => {
+      if (activeGame) return ['A game is already running. Type "exit" to quit it first.'];
+      return startHackGame();
+    },
+    'cipher': () => {
+      if (activeGame) return ['A game is already running. Type "exit" to quit it first.'];
+      return startCipherGame();
+    },
+    'matrix': () => {
+      runMatrixEffect();
+      return ['Entering the Matrix...'];
     },
     'organize': () => {
       return [
@@ -372,6 +503,8 @@ echo "Sign up at Junior Linux Lab to learn how to write real shell scripts!"`
         if (activeGame.name === 'guess') result = handleGuessInput(line);
         else if (activeGame.name === 'quiz') result = handleQuizInput(line);
         else if (activeGame.name === 'calculator') result = handleCalcInput(line);
+        else if (activeGame.name === 'hack') result = handleHackInput(line);
+        else if (activeGame.name === 'cipher') result = handleCipherInput(line);
         result.forEach(outputLine => appendLine(outputLine, 'stdout'));
         terminalBody.scrollTop = terminalBody.scrollHeight;
         return;

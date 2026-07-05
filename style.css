@@ -1631,6 +1631,34 @@ a {
   accent-color: var(--accent-cyan);
 }
 
+.portal-editable-topic {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.portal-editable-topic label {
+  flex-shrink: 0;
+}
+
+.topic-edit-input,
+.edit-input {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 6px 10px;
+  color: var(--text-main);
+  outline: none;
+  font-family: inherit;
+  font-size: 0.85rem;
+  flex: 1;
+}
+
+.topic-edit-input:focus,
+.edit-input:focus {
+  border-color: var(--accent-cyan);
+}
+
 .portal-table {
   width: 100%;
   border-collapse: collapse;

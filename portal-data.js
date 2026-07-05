@@ -1,5 +1,5 @@
 // Junior Linux Lab — shared data layer + EmailJS wiring.
-// Loaded by both index.html (login/enroll/teacher portal) and
+// Loaded by both index.html (login/enroll/mentor portal) and
 // student-dashboard.html (the student's full-page workspace).
 //
 // DEMO / PROTOTYPE NOTICE: this site is static HTML with no backend or
@@ -61,7 +61,12 @@ function sendEnrollmentEmail(details) {
 /* ==========================================================================
    Demo data layer (localStorage-backed)
    ========================================================================== */
-const TEACHER_CREDENTIALS = { id: 'teacher@juniorlinuxlab.com', password: 'teach123' };
+// DEMO CREDENTIAL NOTICE: this repo is public, so nothing hardcoded here is
+// truly confidential — anyone can read the source. This is hidden from the
+// visible UI (no on-screen hint), but treat it as "not shown to casual
+// visitors", not as a real secret.
+const MENTOR_CREDENTIALS = { id: 'ericallan.daniel@gmail.com', password: 'Mentor@2026' };
+const MENTOR_TERMINAL_USERNAME = 'Eric';
 
 const PROJECT_TEMPLATE = [
   { name: 'Calculator', status: 'Not Started' },
@@ -130,6 +135,19 @@ function registerStudent({ parentName, studentName, email, age, course }) {
   return student;
 }
 
+function updateStudentDetails(originalStudentId, { parentName, studentName, email, age }) {
+  const students = loadStudents();
+  const student = students.find(s => s.studentId === originalStudentId);
+  if (!student) return null;
+
+  student.parentName = parentName;
+  student.studentName = studentName;
+  student.studentId = email; // email doubles as the login ID
+  student.age = age;
+  saveStudents(students);
+  return student;
+}
+
 function escapeHtml(text) {
   const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
   return String(text).replace(/[&<>"']/g, m => map[m]);
@@ -150,6 +168,7 @@ function clearSession() {
 
 window.JLLPortal = {
   registerStudent,
+  updateStudentDetails,
   loadStudents,
   saveStudents,
   loadSyllabusProgress,
@@ -160,6 +179,7 @@ window.JLLPortal = {
   setSession,
   clearSession,
   escapeHtml,
-  TEACHER_CREDENTIALS,
+  MENTOR_CREDENTIALS,
+  MENTOR_TERMINAL_USERNAME,
   SYLLABUS_TEMPLATE
 };

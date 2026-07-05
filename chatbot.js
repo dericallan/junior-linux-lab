@@ -51,7 +51,7 @@ function initChatbot() {
   }
 
   // 1. Initial greeting message
-  const welcomeText = "Hi there! 👋 I'm Tux, your Linux teacher bot. Ask me about any Linux command, our classes, or really anything at all — I'll search the web if I don't know something.";
+  const welcomeText = "Hi there! 👋 I'm Tux, your Linux teacher bot. Ask me about any Linux command, our classes, or really anything at all.";
 
   // 2. Setup 50 second auto popup
   const autoPopupTimer = setTimeout(() => {
