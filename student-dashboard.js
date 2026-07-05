@@ -225,6 +225,8 @@ function initStudentDashboard() {
         iframe.className = 'terminal-iframe';
         iframe.src = TERMINAL_BASE_URL + '?user=' + encodeURIComponent(terminalUsername);
         iframe.title = t.label;
+        iframe.allow = 'fullscreen';
+        iframe.setAttribute('allowfullscreen', 'true');
         panelsContainer.appendChild(iframe);
       }
     });
