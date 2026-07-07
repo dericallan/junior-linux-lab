@@ -116,12 +116,12 @@
   <!-- Interactive Terminal Section -->
   <section class="terminal-section" id="terminal-sandbox">
     <div class="container">
-      <div class="section-header text-center">
+      <div class="section-header text-center" data-reveal>
         <h2 class="section-title">Interactive <span class="gradient-text">Bash Simulator</span></h2>
         <p class="section-subtitle">No setup required! Students learn directly inside a secure sandbox. Try running some command line tools below.</p>
       </div>
 
-      <div class="terminal-window">
+      <div class="terminal-window" data-reveal="scale">
         <div class="terminal-header">
           <div class="terminal-dots">
             <span class="dot red"></span>
@@ -150,14 +150,14 @@
   <!-- Curriculum Section -->
   <section class="curriculum-section" id="curriculum">
     <div class="container">
-      <div class="section-header text-center">
+      <div class="section-header text-center" data-reveal>
         <h2 class="section-title">What Your Child <span class="gradient-text">Will Learn</span></h2>
         <p class="section-subtitle">We teach two powerful skill sets—Linux and Coding—in a fun, beginner-friendly way, tailored for ages 8-15.</p>
       </div>
 
       <div class="curriculum-grid" style="grid-template-columns: repeat(2, 1fr); max-width: 900px; margin: 0 auto;">
         <!-- Track 1: Linux -->
-        <div class="curriculum-card featured">
+        <div class="curriculum-card featured" data-reveal="left">
           <div class="card-level">Track 1</div>
           <h3 class="card-title">Linux Fundamentals</h3>
           <p class="card-meta">🐧 System Administration & CLI</p>
@@ -173,7 +173,7 @@
         </div>
 
         <!-- Track 2: Coding -->
-        <div class="curriculum-card featured" style="background: radial-gradient(circle at top right, var(--bg-tertiary) 0%, var(--bg-secondary) 100%);">
+        <div class="curriculum-card featured" data-reveal="right" style="background: radial-gradient(circle at top right, var(--bg-tertiary) 0%, var(--bg-secondary) 100%);">
           <div class="card-level">Track 2</div>
           <h3 class="card-title">Coding Fundamentals</h3>
           <p class="card-meta">💡 Programming Logic & Scripting</p>
@@ -194,14 +194,14 @@
   <!-- Projects Section -->
   <section class="projects-section" id="projects" style="padding: 100px 0; background: radial-gradient(circle at top, rgba(119, 33, 111, 0.03) 0%, rgba(23, 18, 20, 0) 75%); border-top: 1px solid rgba(255, 255, 255, 0.03);">
     <div class="container">
-      <div class="section-header text-center">
+      <div class="section-header text-center" data-reveal>
         <h2 class="section-title">Fun Projects <span class="gradient-text">They Will Build</span></h2>
         <p class="section-subtitle">Every lesson ends with a real, working application. Kids learn by writing code and executing commands—not just watching.</p>
       </div>
 
       <div class="curriculum-grid">
         <!-- Project 1 -->
-        <div class="curriculum-card">
+        <div class="curriculum-card" data-reveal data-reveal-delay="0">
           <div class="card-level">Project 1</div>
           <h3 class="card-title">🔢 Calculator</h3>
           <p class="card-desc">
@@ -210,7 +210,7 @@
         </div>
 
         <!-- Project 2 -->
-        <div class="curriculum-card">
+        <div class="curriculum-card" data-reveal data-reveal-delay="80">
           <div class="card-level">Project 2</div>
           <h3 class="card-title">🎮 Guessing Game</h3>
           <p class="card-desc">
@@ -219,7 +219,7 @@
         </div>
 
         <!-- Project 3 -->
-        <div class="curriculum-card">
+        <div class="curriculum-card" data-reveal data-reveal-delay="160">
           <div class="card-level">Project 3</div>
           <h3 class="card-title">❓ Quiz Game</h3>
           <p class="card-desc">
@@ -228,7 +228,7 @@
         </div>
 
         <!-- Project 4 -->
-        <div class="curriculum-card">
+        <div class="curriculum-card" data-reveal data-reveal-delay="240">
           <div class="card-level">Project 4</div>
           <h3 class="card-title">📁 File Organizer</h3>
           <p class="card-desc">
@@ -243,7 +243,7 @@
   <section class="parents-section" id="parents">
     <div class="parents-bg-shape"></div>
     <div class="container parents-container">
-      <div class="parents-visual">
+      <div class="parents-visual" data-reveal="left">
         <div class="parent-stat-box">
           <div class="stat-progress-circle">
             <svg viewBox="0 0 36 36" class="circular-chart">
@@ -257,7 +257,7 @@
         </div>
       </div>
       
-      <div class="parents-content">
+      <div class="parents-content" data-reveal="right">
         <h2 class="section-title">Designed for <span class="gradient-text">Students</span>,<br>Trusted by <span class="gradient-text">Parents</span></h2>
         <p class="section-subtitle-left">
           Linux isn't just about syntax; it's about learning computational resilience. Here's why our students' families love Junior Linux Lab:
@@ -296,13 +296,13 @@
        any link to #pricing) is clicked — see the reveal logic in app.js. -->
   <section class="pricing-section hidden" id="pricing">
     <div class="container">
-      <div class="section-header text-center">
+      <div class="section-header text-center" data-reveal>
         <h2 class="section-title">Transparent <span class="gradient-text">Pricing & Batches</span></h2>
         <p class="section-subtitle">No subscription fees or hidden costs. One complete 10–12 week program from Linux basics to real projects.</p>
       </div>
 
       <div class="pricing-grid single-card">
-        <div class="pricing-card featured-pricing">
+        <div class="pricing-card featured-pricing" data-reveal="scale">
           <div class="pricing-badge">10–12 Weeks</div>
           <div class="pricing-header">
             <h3>Complete Linux & Coding Program</h3>
@@ -333,14 +333,14 @@
   <!-- FAQ Section -->
   <section class="faq-section" id="faq">
     <div class="container">
-      <div class="section-header text-center">
+      <div class="section-header text-center" data-reveal>
         <h2 class="section-title">Frequently Asked <span class="gradient-text">Questions</span></h2>
         <p class="section-subtitle">Have questions about our syllabus, systems, or registration? Find fast answers below.</p>
       </div>
 
       <div class="faq-accordion-container">
         <!-- Q1 -->
-        <div class="faq-item">
+        <div class="faq-item" data-reveal data-reveal-delay="0">
           <button class="faq-question">
             <span>Do we need to install Linux on our home computer?</span>
             <span class="faq-icon">+</span>
@@ -351,7 +351,7 @@
         </div>
 
         <!-- Q2 -->
-        <div class="faq-item">
+        <div class="faq-item" data-reveal data-reveal-delay="60">
           <button class="faq-question">
             <span>What are the system/hardware requirements?</span>
             <span class="faq-icon">+</span>
@@ -362,7 +362,7 @@
         </div>
 
         <!-- Q3 -->
-        <div class="faq-item">
+        <div class="faq-item" data-reveal data-reveal-delay="120">
           <button class="faq-question">
             <span>My child has zero coding background. Can they start here?</span>
             <span class="faq-icon">+</span>
@@ -373,7 +373,7 @@
         </div>
 
         <!-- Q4 -->
-        <div class="faq-item">
+        <div class="faq-item" data-reveal data-reveal-delay="180">
           <button class="faq-question">
             <span>What is the cohort size and mentorship support?</span>
             <span class="faq-icon">+</span>
@@ -384,7 +384,7 @@
         </div>
 
         <!-- Q5 -->
-        <div class="faq-item">
+        <div class="faq-item" data-reveal data-reveal-delay="240">
           <button class="faq-question">
             <span>Do you offer a money-back guarantee?</span>
             <span class="faq-icon">+</span>
@@ -598,5 +598,6 @@
   <script src="js/portal.js"></script>
   <script src="js/app.js"></script>
   <script src="js/chatbot.js"></script>
+  <script src="js/scroll-reveal.js"></script>
 </body>
 </html>
