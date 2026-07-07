@@ -551,6 +551,12 @@ a {
   margin-top: 20px;
 }
 
+.curriculum-grid.tracks-grid {
+  grid-template-columns: repeat(2, 1fr);
+  max-width: 900px;
+  margin: 0 auto;
+}
+
 .curriculum-card {
   background: var(--bg-secondary);
   border: 1px solid rgba(255, 255, 255, 0.05);
@@ -1857,6 +1863,12 @@ a {
     max-width: 480px;
     margin: 40px auto 0;
     gap: 40px;
+  }
+
+  .curriculum-grid.tracks-grid {
+    grid-template-columns: 1fr;
+    max-width: 480px;
+    margin: 40px auto 0;
   }
 
   .parents-container {
