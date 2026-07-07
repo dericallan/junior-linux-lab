@@ -45,7 +45,7 @@ function initPortal() {
   loginNavBtn.addEventListener('click', () => {
     const session = getSession();
     if (session && session.role === 'student') {
-      window.location.href = 'student-dashboard.html';
+      window.location.href = 'pages/student-dashboard.html';
     } else if (session && session.role === 'mentor') {
       openTeacherDashboard();
     } else {
@@ -92,7 +92,7 @@ function initPortal() {
       const student = students.find(s => s.studentId.toLowerCase() === id.toLowerCase() && s.password === password);
       if (student) {
         setSession({ role: 'student', studentId: student.studentId });
-        window.location.href = 'student-dashboard.html';
+        window.location.href = 'pages/student-dashboard.html';
       } else {
         showLoginError('No matching student account. Check your ID/password, or enroll first.');
       }

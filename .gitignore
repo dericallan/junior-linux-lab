@@ -1,0 +1,9 @@
+# OS/editor cruft
+.DS_Store
+Thumbs.db
+*.swp
+*~
+
+# Local env/secrets, if ever added
+.env
+.env.local

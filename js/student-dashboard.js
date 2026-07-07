@@ -13,7 +13,7 @@ function initStudentDashboard() {
 
   const session = getSession();
   if (!session || session.role !== 'student') {
-    window.location.href = 'index.html';
+    window.location.href = '../index.html';
     return;
   }
 
@@ -23,7 +23,7 @@ function initStudentDashboard() {
     // Session refers to a student record that no longer exists (e.g. demo
     // data was cleared) — bounce back rather than showing a broken page.
     clearSession();
-    window.location.href = 'index.html';
+    window.location.href = '../index.html';
     return;
   }
 
@@ -261,7 +261,7 @@ function initStudentDashboard() {
 
   document.getElementById('dashboard-logout-btn').addEventListener('click', () => {
     clearSession();
-    window.location.href = 'index.html';
+    window.location.href = '../index.html';
   });
 
   renderOverview();

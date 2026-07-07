@@ -12,7 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Ubuntu+Mono:wght@400;700&family=Red+Hat+Text:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   
   <!-- CSS Stylesheet -->
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
@@ -93,7 +93,7 @@
       </div>
       <div class="hero-visual">
         <div class="mascot-wrapper">
-          <img src="assets/tux-mascot.jpg" alt="Junior Linux Lab Mascot Penguin wearing neon smart glasses" class="mascot-img">
+          <img src="assets/images/tux-mascot.jpg" alt="Junior Linux Lab Mascot Penguin wearing neon smart glasses" class="mascot-img">
           <div class="floating-card c1">
             <span class="card-icon">🎮</span>
             <div>
@@ -582,7 +582,7 @@
       var session = null;
       try { session = JSON.parse(sessionStorage.getItem('jll_session') || 'null'); } catch (e) {}
       if (session && session.role === 'student') {
-        window.location.href = 'student-dashboard.html';
+        window.location.href = 'pages/student-dashboard.html';
       } else if (!session) {
         document.getElementById('login-modal').classList.add('open');
       }
@@ -594,9 +594,9 @@
   <!-- Javascript Scripts -->
   <!-- EmailJS: sends the enrollment confirmation email from the browser (no backend needed). -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js" async></script>
-  <script src="portal-data.js"></script>
-  <script src="portal.js"></script>
-  <script src="app.js"></script>
-  <script src="chatbot.js"></script>
+  <script src="js/portal-data.js"></script>
+  <script src="js/portal.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/chatbot.js"></script>
 </body>
 </html>
