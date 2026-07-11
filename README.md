@@ -1,7 +1,9 @@
 # Junior Linux Lab
 
 Marketing site + student/mentor portal for Junior Linux Lab, a Linux & coding
-course for kids aged 8-15. Static HTML/CSS/JS — no build step, no backend.
+course for kids aged 8-15. Static HTML/CSS/JS — no build step, hosted on
+GitHub Pages — backed by Firebase (Authentication + Firestore) for real,
+cross-device student/mentor data.
 
 **Live site:** https://dericallan.github.io/junior-linux-lab/
 
@@ -35,20 +37,30 @@ then open http://localhost:8010/.
 
 ## Key things to know
 
-- **No backend or database.** Student accounts, projects, and fee status live
-  in the browser's `localStorage` — a demo/prototype data layer, not
-  production-grade. See the notice at the top of `js/portal-data.js`.
+- **Firebase backend.** Student accounts, enrollment data, fee status, and
+  the mentor-editable syllabus live in Firestore, gated by Firebase
+  Authentication — real, shared data visible from any browser/device, not a
+  per-browser demo. Config lives at the top of `js/portal-data.js`
+  (`firebaseConfig`) — that object is safe to be public; it's a client
+  identifier, not a secret. Security comes from `firestore.rules` (repo
+  root), which must be deployed via Firebase Console → Firestore Database →
+  Rules.
+- **Mentor login** is a real Firebase Auth account (Authentication → Users in
+  the Firebase console), matched against the fixed email in `MENTOR_EMAIL` in
+  `js/portal-data.js`. Change the mentor's password from the Firebase
+  console, not from this repo.
+- **Student login** is also a real Firebase Auth account, created
+  automatically at enrollment (`registerStudent()` in `js/portal-data.js`)
+  with an auto-generated password shown once in the enrollment confirmation
+  and sent via email.
 - **EmailJS** sends the enrollment confirmation email. Configure your own
   Service ID / Template ID / Public Key at the top of `js/portal-data.js` —
   see the comment there for the exact template variables it sends.
-- **Mentor login** credentials are also in `js/portal-data.js`
-  (`MENTOR_CREDENTIALS`). This repo is public, so treat that value as hidden
-  from casual UI viewing, not as a real secret — anyone can read the source.
 - **The embedded terminal** (student/mentor "Terminal" tabs) is a separate
   project: https://github.com/dericallan/browser-linux-terminal — a real
   Alpine Linux booted via [v86](https://github.com/copy/v86) (WebAssembly x86
   emulation), embedded via iframe. Live mentor↔student terminal mirroring
-  runs over WebRTC (PeerJS), independent of this repo.
+  runs over WebRTC (PeerJS), independent of this repo and of Firebase.
 
 ## Deploying
 

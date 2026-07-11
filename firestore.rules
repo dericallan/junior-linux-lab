@@ -1,0 +1,28 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isMentor() {
+      return request.auth != null
+        && request.auth.token.email == 'ericallan.daniel@gmail.com';
+    }
+
+    // One doc per student, keyed by their Firebase Auth uid. A student can
+    // read/update only their own doc; the mentor can read/update/delete any.
+    // Creation is restricted to the just-created account creating its own doc
+    // (what registerStudent() does right after sign-up).
+    match /students/{uid} {
+      allow read: if request.auth != null && (request.auth.uid == uid || isMentor());
+      allow create: if request.auth != null && request.auth.uid == uid;
+      allow update: if request.auth != null && (request.auth.uid == uid || isMentor());
+      allow delete: if isMentor();
+    }
+
+    // Single shared doc holding the syllabus/week checklist. Any signed-in
+    // user (student or mentor) can read it; only the mentor can edit it.
+    match /syllabus/{docId} {
+      allow read: if request.auth != null;
+      allow write: if isMentor();
+    }
+  }
+}

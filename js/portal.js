@@ -7,9 +7,10 @@ document.addEventListener('DOMContentLoaded', initPortal);
 
 function initPortal() {
   const {
-    loadStudents, saveStudents, updateStudentDetails, loadSyllabusProgress, saveSyllabusProgress,
-    sendEnrollmentEmail, initEmailJS, getSession, setSession, clearSession,
-    escapeHtml, usernameFromName, MENTOR_CREDENTIALS, MENTOR_TERMINAL_USERNAME
+    loadStudents, updateStudentDetails, setStudentFeeStatus, loadSyllabusProgress, saveSyllabusProgress,
+    sendEnrollmentEmail, initEmailJS, onAuthReady, getCurrentUser, isMentorUser,
+    loginMentor, loginStudent, logout,
+    escapeHtml, usernameFromName, MENTOR_TERMINAL_USERNAME
   } = window.JLLPortal;
 
   initEmailJS();
@@ -18,6 +19,7 @@ function initPortal() {
   const loginModal = document.getElementById('login-modal');
   const loginModalClose = document.getElementById('login-modal-close');
   const loginForm = document.getElementById('login-form');
+  const loginSubmitBtn = loginForm.querySelector('button[type="submit"]');
   const loginError = document.getElementById('login-error');
   const loginIdInput = document.getElementById('login-id');
   const loginHint = document.getElementById('login-hint');
@@ -28,6 +30,13 @@ function initPortal() {
   if (!loginNavBtn || !loginModal || !teacherDashboardModal) return;
 
   let activeRole = 'student';
+  let currentUser = null;
+  let isMentor = false;
+
+  onAuthReady((user) => {
+    currentUser = user;
+    isMentor = isMentorUser(user);
+  });
 
   function openLogin() {
     loginError.classList.add('hidden');
@@ -43,11 +52,10 @@ function initPortal() {
   }
 
   loginNavBtn.addEventListener('click', () => {
-    const session = getSession();
-    if (session && session.role === 'student') {
-      window.location.href = 'pages/student-dashboard.html';
-    } else if (session && session.role === 'mentor') {
+    if (currentUser && isMentor) {
       openTeacherDashboard();
+    } else if (currentUser && !isMentor) {
+      window.location.href = 'pages/student-dashboard.html';
     } else {
       openLogin();
     }
@@ -74,34 +82,38 @@ function initPortal() {
     });
   });
 
-  loginForm.addEventListener('submit', (e) => {
+  loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const id = loginIdInput.value.trim();
     const password = document.getElementById('login-password').value;
 
-    if (activeRole === 'mentor') {
-      if (id.toLowerCase() === MENTOR_CREDENTIALS.id.toLowerCase() && password === MENTOR_CREDENTIALS.password) {
-        setSession({ role: 'mentor' });
+    loginError.classList.add('hidden');
+    loginSubmitBtn.disabled = true;
+    try {
+      if (activeRole === 'mentor') {
+        await loginMentor(id, password);
+        currentUser = getCurrentUser();
+        isMentor = true;
         closeLogin();
-        openTeacherDashboard();
+        await openTeacherDashboard();
       } else {
-        showLoginError('Incorrect mentor ID or password.');
-      }
-    } else {
-      const students = loadStudents();
-      const student = students.find(s => s.studentId.toLowerCase() === id.toLowerCase() && s.password === password);
-      if (student) {
-        setSession({ role: 'student', studentId: student.studentId });
+        await loginStudent(id, password);
+        currentUser = getCurrentUser();
+        isMentor = false;
         window.location.href = 'pages/student-dashboard.html';
-      } else {
-        showLoginError('No matching student account. Check your ID/password, or enroll first.');
       }
+    } catch (err) {
+      showLoginError(activeRole === 'mentor'
+        ? 'Incorrect mentor ID or password.'
+        : 'No matching student account. Check your ID/password, or enroll first.');
+    } finally {
+      loginSubmitBtn.disabled = false;
     }
   });
 
   /* ---------------- Mentor dashboard ---------------- */
-  function renderTeacherProgress() {
-    const progress = loadSyllabusProgress();
+  async function renderTeacherProgress() {
+    const progress = await loadSyllabusProgress();
     const panel = document.getElementById('teacher-tab-progress');
     panel.innerHTML =
       '<p class="portal-hint" style="margin-top:0; text-align:left;">Edit a topic\'s text and it updates immediately in every student\'s Notes tab.</p>' +
@@ -116,25 +128,25 @@ function initPortal() {
       list.appendChild(li);
     });
     list.querySelectorAll('input[type="checkbox"]').forEach(cb => {
-      cb.addEventListener('change', () => {
+      cb.addEventListener('change', async () => {
         const idx = parseInt(cb.getAttribute('data-idx'), 10);
-        const p = loadSyllabusProgress();
+        const p = await loadSyllabusProgress();
         p[idx].done = cb.checked;
-        saveSyllabusProgress(p);
+        await saveSyllabusProgress(p);
       });
     });
     list.querySelectorAll('.topic-edit-input').forEach(input => {
-      input.addEventListener('change', () => {
+      input.addEventListener('change', async () => {
         const idx = parseInt(input.getAttribute('data-idx'), 10);
-        const p = loadSyllabusProgress();
+        const p = await loadSyllabusProgress();
         p[idx].topic = input.value;
-        saveSyllabusProgress(p);
+        await saveSyllabusProgress(p);
       });
     });
   }
 
-  function renderTeacherStudents() {
-    const students = loadStudents();
+  async function renderTeacherStudents() {
+    const students = await loadStudents();
     const panel = document.getElementById('teacher-tab-students');
     if (students.length === 0) {
       panel.innerHTML = '<p class="portal-empty">No students enrolled yet.</p>';
@@ -148,7 +160,7 @@ function initPortal() {
           '<td class="cell-student-name">' + escapeHtml(s.studentName || '—') + '</td>' +
           '<td class="cell-parent-name">' + escapeHtml(s.parentName) + '</td>' +
           '<td class="cell-age">' + escapeHtml(String(s.age)) + '</td>' +
-          '<td class="cell-email">' + escapeHtml(s.studentId) + '</td>' +
+          '<td class="cell-email">' + escapeHtml(s.email) + '</td>' +
           '<td>' + new Date(s.enrolledAt).toLocaleDateString() + '</td>' +
           '<td>' + (s.feeStatus === 'paid' ? '<span class="fee-badge paid">Paid</span>' : '<span class="fee-badge pending">Pending</span>') + '</td>' +
           '<td>' +
@@ -160,7 +172,7 @@ function initPortal() {
       '</tbody></table>';
 
     panel.querySelectorAll('.edit-student-btn').forEach(btn => {
-      btn.addEventListener('click', () => startEditStudentRow(btn.getAttribute('data-id')));
+      btn.addEventListener('click', () => startEditStudentRow(btn.getAttribute('data-id'), students));
     });
     panel.querySelectorAll('.watch-student-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -170,8 +182,7 @@ function initPortal() {
     });
   }
 
-  function startEditStudentRow(studentId) {
-    const students = loadStudents();
+  function startEditStudentRow(studentId, students) {
     const student = students.find(s => s.studentId === studentId);
     if (!student) return;
 
@@ -181,27 +192,27 @@ function initPortal() {
     row.querySelector('.cell-student-name').innerHTML = '<input type="text" class="edit-input" data-field="studentName" value="' + escapeHtml(student.studentName || '').replace(/"/g, '&quot;') + '">';
     row.querySelector('.cell-parent-name').innerHTML = '<input type="text" class="edit-input" data-field="parentName" value="' + escapeHtml(student.parentName || '').replace(/"/g, '&quot;') + '">';
     row.querySelector('.cell-age').innerHTML = '<input type="number" class="edit-input" data-field="age" value="' + escapeHtml(String(student.age)) + '" style="width:60px;">';
-    row.querySelector('.cell-email').innerHTML = '<input type="email" class="edit-input" data-field="email" value="' + escapeHtml(student.studentId).replace(/"/g, '&quot;') + '">';
+    // Login email is tied to the student's Firebase account and can't be
+    // changed from here without an admin backend, so it stays read-only.
 
     const lastCell = row.querySelector('td:last-child');
     lastCell.innerHTML =
       '<button class="btn btn-primary btn-sm save-student-btn" data-id="' + escapeHtml(studentId) + '">Save</button> ' +
       '<button class="btn btn-secondary btn-sm cancel-student-btn">Cancel</button>';
 
-    lastCell.querySelector('.save-student-btn').addEventListener('click', () => {
+    lastCell.querySelector('.save-student-btn').addEventListener('click', async () => {
       const parentName = row.querySelector('[data-field="parentName"]').value.trim();
       const studentName = row.querySelector('[data-field="studentName"]').value.trim();
-      const email = row.querySelector('[data-field="email"]').value.trim();
       const age = row.querySelector('[data-field="age"]').value.trim();
-      updateStudentDetails(studentId, { parentName, studentName, email, age });
-      renderTeacherStudents();
-      renderTeacherFees();
+      await updateStudentDetails(studentId, { parentName, studentName, age });
+      await renderTeacherStudents();
+      await renderTeacherFees();
     });
     lastCell.querySelector('.cancel-student-btn').addEventListener('click', renderTeacherStudents);
   }
 
-  function renderTeacherFees() {
-    const students = loadStudents();
+  async function renderTeacherFees() {
+    const students = await loadStudents();
     const pending = students.filter(s => s.feeStatus === 'pending');
     const panel = document.getElementById('teacher-tab-fees');
     if (pending.length === 0) {
@@ -214,7 +225,7 @@ function initPortal() {
         '<tr>' +
           '<td>' + escapeHtml(s.studentName || '—') + '</td>' +
           '<td>' + escapeHtml(s.parentName) + '</td>' +
-          '<td>' + escapeHtml(s.studentId) + '</td>' +
+          '<td>' + escapeHtml(s.email) + '</td>' +
           '<td>' + escapeHtml(s.course) + '</td>' +
           '<td><button class="btn btn-secondary btn-sm mark-paid-btn" data-id="' + escapeHtml(s.studentId) + '">Mark Paid</button></td>' +
         '</tr>'
@@ -222,14 +233,11 @@ function initPortal() {
       '</tbody></table>';
 
     panel.querySelectorAll('.mark-paid-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', async () => {
         const id = btn.getAttribute('data-id');
-        const allStudents = loadStudents();
-        const s = allStudents.find(s2 => s2.studentId === id);
-        s.feeStatus = 'paid';
-        saveStudents(allStudents);
-        renderTeacherFees();
-        renderTeacherStudents();
+        await setStudentFeeStatus(id, 'paid');
+        await renderTeacherFees();
+        await renderTeacherStudents();
       });
     });
   }
@@ -318,10 +326,8 @@ function initPortal() {
     });
   }
 
-  function openTeacherDashboard() {
-    renderTeacherProgress();
-    renderTeacherStudents();
-    renderTeacherFees();
+  async function openTeacherDashboard() {
+    await Promise.all([renderTeacherProgress(), renderTeacherStudents(), renderTeacherFees()]);
     renderTeacherTerminal();
     teacherDashboardModal.classList.add('open');
   }
@@ -329,8 +335,10 @@ function initPortal() {
   document.getElementById('teacher-dashboard-close').addEventListener('click', () => {
     teacherDashboardModal.classList.remove('open');
   });
-  document.getElementById('teacher-logout-btn').addEventListener('click', () => {
-    clearSession();
+  document.getElementById('teacher-logout-btn').addEventListener('click', async () => {
+    await logout();
+    currentUser = null;
+    isMentor = false;
     teacherDashboardModal.classList.remove('open');
   });
 

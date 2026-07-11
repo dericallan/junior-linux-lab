@@ -1,20 +1,37 @@
-// Junior Linux Lab — shared data layer + EmailJS wiring.
+// Junior Linux Lab — shared data layer (Firebase) + EmailJS wiring.
 // Loaded by both index.html (login/enroll/mentor portal) and
 // student-dashboard.html (the student's full-page workspace).
 //
-// DEMO / PROTOTYPE NOTICE: this site is static HTML with no backend or
-// database. Accounts and progress data live only in this browser's
-// localStorage — there is no real security, and data will not sync across
-// devices or survive clearing browser storage. It's built to demonstrate
-// the feature, not to hold real student data.
+// This is a real backend: student accounts + progress live in Firestore,
+// gated by Firebase Authentication, so enrollments and mentor edits are
+// visible from any browser/device — not just the one that made them.
+// See firestore.rules (repo root) for the access rules that must be
+// deployed in the Firebase console for this to be secure.
+
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
+import {
+  getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword,
+  signOut, updatePassword
+} from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
+import {
+  getFirestore, doc, getDoc, getDocs, setDoc, updateDoc, collection
+} from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA5INQztBiq389LItVwnFYB9gZgTQON9W4",
+  authDomain: "junior-linux-lab.firebaseapp.com",
+  projectId: "junior-linux-lab",
+  storageBucket: "junior-linux-lab.firebasestorage.app",
+  messagingSenderId: "878144180344",
+  appId: "1:878144180344:web:56a178de4d8a608c7f9d8d"
+};
+
+const firebaseApp = initializeApp(firebaseConfig);
+const auth = getAuth(firebaseApp);
+const db = getFirestore(firebaseApp);
 
 /* ==========================================================================
    EmailJS configuration
-   To actually send enrollment emails, create a free account at emailjs.com,
-   then replace the three placeholders below with your own Service ID,
-   Template ID, and Public Key. Your email template should use these
-   variables: {{to_email}}, {{parent_name}}, {{student_name}}, {{student_age}},
-   {{course_name}}, {{price}}, {{batch_times}}, {{login_id}}, {{login_password}}.
    ========================================================================== */
 const EMAILJS_PUBLIC_KEY = 'mDsVxFDHqLRc7pPol';
 const EMAILJS_SERVICE_ID = 'service_1k5l144';
@@ -30,10 +47,6 @@ function initEmailJS() {
     return;
   }
 
-  // The EmailJS SDK loads via an async <script> tag so it never blocks the
-  // rest of the page from becoming interactive. That means it may not have
-  // finished loading yet when this runs, so poll briefly instead of giving
-  // up immediately.
   let attempts = 0;
   const tryInit = () => {
     if (window.emailjs) {
@@ -59,13 +72,9 @@ function sendEnrollmentEmail(details) {
 }
 
 /* ==========================================================================
-   Demo data layer (localStorage-backed)
+   Firebase-backed data layer
    ========================================================================== */
-// DEMO CREDENTIAL NOTICE: this repo is public, so nothing hardcoded here is
-// truly confidential — anyone can read the source. This is hidden from the
-// visible UI (no on-screen hint), but treat it as "not shown to casual
-// visitors", not as a real secret.
-const MENTOR_CREDENTIALS = { id: 'ericallan.daniel@gmail.com', password: 'Mentor@2026' };
+const MENTOR_EMAIL = 'ericallan.daniel@gmail.com';
 const MENTOR_TERMINAL_USERNAME = 'Eric';
 
 const PROJECT_TEMPLATE = [
@@ -90,38 +99,65 @@ const SYLLABUS_TEMPLATE = [
   { week: 12, topic: 'Build: File Organizer & final showcase' }
 ];
 
-function loadStudents() {
-  return JSON.parse(localStorage.getItem('jll_students') || '[]');
-}
-
-function saveStudents(students) {
-  localStorage.setItem('jll_students', JSON.stringify(students));
-}
-
-function loadSyllabusProgress() {
-  const stored = JSON.parse(localStorage.getItem('jll_syllabus_progress') || 'null');
-  if (stored) return stored;
-  const fresh = SYLLABUS_TEMPLATE.map(w => ({ ...w, done: false }));
-  localStorage.setItem('jll_syllabus_progress', JSON.stringify(fresh));
-  return fresh;
-}
-
-function saveSyllabusProgress(progress) {
-  localStorage.setItem('jll_syllabus_progress', JSON.stringify(progress));
-}
-
 function generatePassword() {
   return Math.random().toString(36).slice(-8);
 }
 
-function registerStudent({ parentName, studentName, email, age, course }) {
-  const students = loadStudents();
-  const existing = students.find(s => s.studentId.toLowerCase() === email.toLowerCase());
-  if (existing) return existing;
+function studentDocToObject(uid, data) {
+  return { studentId: uid, ...data };
+}
 
-  const student = {
-    studentId: email,
-    password: generatePassword(),
+/* ---- Auth ---- */
+function onAuthReady(callback) {
+  const unsubscribe = onAuthStateChanged(auth, (user) => {
+    unsubscribe();
+    callback(user);
+  });
+}
+
+function getCurrentUser() {
+  return auth.currentUser;
+}
+
+function isMentorUser(user) {
+  return !!user && user.email && user.email.toLowerCase() === MENTOR_EMAIL.toLowerCase();
+}
+
+async function loginMentor(email, password) {
+  const cred = await signInWithEmailAndPassword(auth, email, password);
+  if (!isMentorUser(cred.user)) {
+    await signOut(auth);
+    throw new Error('Not authorized as mentor.');
+  }
+  return cred.user;
+}
+
+async function loginStudent(email, password) {
+  const cred = await signInWithEmailAndPassword(auth, email, password);
+  const snap = await getDoc(doc(db, 'students', cred.user.uid));
+  if (!snap.exists()) {
+    await signOut(auth);
+    throw new Error('No matching student account.');
+  }
+  return studentDocToObject(cred.user.uid, snap.data());
+}
+
+function logout() {
+  return signOut(auth);
+}
+
+async function changeStudentPassword(newPassword) {
+  if (!auth.currentUser) throw new Error('Not signed in.');
+  return updatePassword(auth.currentUser, newPassword);
+}
+
+/* ---- Students ---- */
+async function registerStudent({ parentName, studentName, email, age, course }) {
+  const password = generatePassword();
+  const cred = await createUserWithEmailAndPassword(auth, email, password);
+
+  const studentDoc = {
+    email,
     parentName,
     studentName,
     age,
@@ -130,22 +166,44 @@ function registerStudent({ parentName, studentName, email, age, course }) {
     feeStatus: 'pending',
     projects: PROJECT_TEMPLATE.map(p => ({ ...p }))
   };
-  students.push(student);
-  saveStudents(students);
-  return student;
+  await setDoc(doc(db, 'students', cred.user.uid), studentDoc);
+
+  return { studentId: cred.user.uid, password, ...studentDoc };
 }
 
-function updateStudentDetails(originalStudentId, { parentName, studentName, email, age }) {
-  const students = loadStudents();
-  const student = students.find(s => s.studentId === originalStudentId);
-  if (!student) return null;
+async function loadStudents() {
+  const snap = await getDocs(collection(db, 'students'));
+  return snap.docs.map(d => studentDocToObject(d.id, d.data()));
+}
 
-  student.parentName = parentName;
-  student.studentName = studentName;
-  student.studentId = email; // email doubles as the login ID
-  student.age = age;
-  saveStudents(students);
-  return student;
+async function getStudent(uid) {
+  const snap = await getDoc(doc(db, 'students', uid));
+  return snap.exists() ? studentDocToObject(uid, snap.data()) : null;
+}
+
+async function updateStudentDetails(uid, { parentName, studentName, age }) {
+  await updateDoc(doc(db, 'students', uid), { parentName, studentName, age });
+  return getStudent(uid);
+}
+
+async function setStudentFeeStatus(uid, feeStatus) {
+  await updateDoc(doc(db, 'students', uid), { feeStatus });
+}
+
+async function setStudentProjects(uid, projects) {
+  await updateDoc(doc(db, 'students', uid), { projects });
+}
+
+/* ---- Syllabus (mentor-editable, shared with every student) ---- */
+async function loadSyllabusProgress() {
+  const ref = doc(db, 'syllabus', 'current');
+  const snap = await getDoc(ref);
+  if (snap.exists()) return snap.data().weeks;
+  return SYLLABUS_TEMPLATE.map(w => ({ ...w, done: false }));
+}
+
+async function saveSyllabusProgress(progress) {
+  await setDoc(doc(db, 'syllabus', 'current'), { weeks: progress });
 }
 
 function usernameFromName(name) {
@@ -158,34 +216,27 @@ function escapeHtml(text) {
   return String(text).replace(/[&<>"']/g, m => map[m]);
 }
 
-/* ==========================================================================
-   Session helpers (shared between index.html and student-dashboard.html)
-   ========================================================================== */
-function getSession() {
-  return JSON.parse(sessionStorage.getItem('jll_session') || 'null');
-}
-function setSession(session) {
-  sessionStorage.setItem('jll_session', JSON.stringify(session));
-}
-function clearSession() {
-  sessionStorage.removeItem('jll_session');
-}
-
 window.JLLPortal = {
   registerStudent,
   updateStudentDetails,
+  setStudentFeeStatus,
+  setStudentProjects,
   loadStudents,
-  saveStudents,
+  getStudent,
   loadSyllabusProgress,
   saveSyllabusProgress,
   sendEnrollmentEmail,
   initEmailJS,
-  getSession,
-  setSession,
-  clearSession,
+  onAuthReady,
+  getCurrentUser,
+  isMentorUser,
+  loginMentor,
+  loginStudent,
+  logout,
+  changeStudentPassword,
   escapeHtml,
   usernameFromName,
-  MENTOR_CREDENTIALS,
+  MENTOR_EMAIL,
   MENTOR_TERMINAL_USERNAME,
   SYLLABUS_TEMPLATE
 };

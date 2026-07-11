@@ -597,9 +597,9 @@ function initEnrollModal() {
 
   // Submit action
   if (enrollForm) {
-    enrollForm.addEventListener('submit', (e) => {
+    enrollForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      
+
       const parentName = document.getElementById('enroll-parent-name').value;
       const studentName = document.getElementById('enroll-student-name').value;
       const email = document.getElementById('enroll-email').value;
@@ -608,44 +608,57 @@ function initEnrollModal() {
         ? 'Complete Linux & Coding Program (₹4,999)'
         : courseSelect.value;
 
+      const submitBtn = enrollForm.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+
       let student = null;
-      if (window.JLLPortal) {
-        student = window.JLLPortal.registerStudent({
-          parentName,
-          studentName,
-          email,
-          age: studentAge,
-          course: 'Complete Linux & Coding Program'
-        });
+      try {
+        if (window.JLLPortal) {
+          student = await window.JLLPortal.registerStudent({
+            parentName,
+            studentName,
+            email,
+            age: studentAge,
+            course: 'Complete Linux & Coding Program'
+          });
 
-        window.JLLPortal.sendEnrollmentEmail({
-          to_email: email,
-          parent_name: parentName,
-          student_name: studentName,
-          student_age: studentAge,
-          course_name: 'Complete Linux & Coding Program',
-          price: '₹4,999',
-          batch_times: 'Sat 6:00 PM - 8:00 PM IST / Sun 10:00 AM - 12:00 PM IST',
-          login_id: student.studentId,
-          login_password: student.password
-        }).then((res) => {
-          if (res && res.skipped) {
-            console.info('[Junior Linux Lab] Enrollment email not sent — EmailJS is not configured yet.');
-          }
-        }).catch((err) => {
-          console.error('[Junior Linux Lab] Failed to send enrollment email:', err);
-        });
+          window.JLLPortal.sendEnrollmentEmail({
+            to_email: email,
+            parent_name: parentName,
+            student_name: studentName,
+            student_age: studentAge,
+            course_name: 'Complete Linux & Coding Program',
+            price: '₹4,999',
+            batch_times: 'Sat 6:00 PM - 8:00 PM IST / Sun 10:00 AM - 12:00 PM IST',
+            login_id: email,
+            login_password: student.password
+          }).then((res) => {
+            if (res && res.skipped) {
+              console.info('[Junior Linux Lab] Enrollment email not sent — EmailJS is not configured yet.');
+            }
+          }).catch((err) => {
+            console.error('[Junior Linux Lab] Failed to send enrollment email:', err);
+          });
+        }
+
+        const credentialsNote = student
+          ? `\n\nYour student login has been created:\nID: ${email}\nPassword: ${student.password}\n\nUse the Login button in the top navigation to view your dashboard.`
+          : '';
+
+        alert(`Thank you, ${parentName}! We have reserved a place in '${selectedCourse}' for your student. A confirmation email with course and fee details has been sent to ${email}.${credentialsNote}`);
+
+        closeEnrollModal();
+        enrollForm.reset();
+      } catch (err) {
+        if (err && err.code === 'auth/email-already-in-use') {
+          alert(`${email} is already enrolled. Use the Login button to access the existing student dashboard.`);
+        } else {
+          console.error('[Junior Linux Lab] Enrollment failed:', err);
+          alert('Something went wrong while enrolling. Please try again in a moment.');
+        }
+      } finally {
+        submitBtn.disabled = false;
       }
-
-      const credentialsNote = student
-        ? `\n\nYour student login has been created:\nID: ${student.studentId}\nPassword: ${student.password}\n\nUse the Login button in the top navigation to view your dashboard.`
-        : '';
-
-      // Mock confirmation alert (can style nicer inside production setups)
-      alert(`Thank you, ${parentName}! We have reserved a place in '${selectedCourse}' for your student. A confirmation email with course and fee details has been sent to ${email}.${credentialsNote}`);
-
-      closeEnrollModal();
-      enrollForm.reset();
     });
   }
 }
@@ -665,3 +678,9 @@ function closeEnrollModal() {
   const modal = document.getElementById('enroll-modal');
   modal.classList.remove('open');
 }
+
+// app.js is loaded as an ES module now (for consistent script-execution
+// ordering with portal-data.js's Firebase imports), so top-level functions
+// no longer auto-attach to `window` the way classic scripts' do. chatbot.js
+// reaches into window.openEnrollModal, so expose it explicitly.
+window.openEnrollModal = openEnrollModal;

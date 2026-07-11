@@ -571,33 +571,16 @@
     </div>
   </div>
 
-  <!-- Instant fallback: opens the login modal on first click even if portal.js
-       hasn't finished loading yet. Inline, so there's no network round-trip —
-       it runs the moment the parser reaches it. Only handles the "not logged
-       in yet" case (the common one for a fresh page load); if a session
-       already exists, portal.js's own listener — which is what renders the
-       actual dashboard content — takes over once it's loaded. -->
-  <script>
-    document.getElementById('login-nav-btn').addEventListener('click', function () {
-      var session = null;
-      try { session = JSON.parse(sessionStorage.getItem('jll_session') || 'null'); } catch (e) {}
-      if (session && session.role === 'student') {
-        window.location.href = 'pages/student-dashboard.html';
-      } else if (!session) {
-        document.getElementById('login-modal').classList.add('open');
-      }
-      // Mentor session: handled by portal.js's own listener once it loads,
-      // since opening the mentor portal needs its render functions.
-    });
-  </script>
-
   <!-- Javascript Scripts -->
   <!-- EmailJS: sends the enrollment confirmation email from the browser (no backend needed). -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js" async></script>
-  <script src="js/portal-data.js"></script>
-  <script src="js/portal.js"></script>
-  <script src="js/app.js"></script>
-  <script src="js/chatbot.js"></script>
-  <script src="js/scroll-reveal.js"></script>
+  <!-- portal-data.js is an ES module (Firebase Auth/Firestore); module scripts
+       are deferred by spec, so it — and every module below — finishes running
+       before DOMContentLoaded fires, in document order. -->
+  <script type="module" src="js/portal-data.js"></script>
+  <script type="module" src="js/portal.js"></script>
+  <script type="module" src="js/app.js"></script>
+  <script type="module" src="js/chatbot.js"></script>
+  <script type="module" src="js/scroll-reveal.js"></script>
 </body>
 </html>
