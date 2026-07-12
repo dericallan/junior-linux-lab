@@ -16,6 +16,9 @@ import {
 import {
   getFirestore, doc, getDoc, getDocs, setDoc, updateDoc, collection
 } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
+import {
+  getStorage, ref as storageRef, uploadBytes, getBytes
+} from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyA5INQztBiq389LItVwnFYB9gZgTQON9W4",
@@ -29,6 +32,7 @@ const firebaseConfig = {
 const firebaseApp = initializeApp(firebaseConfig);
 const auth = getAuth(firebaseApp);
 const db = getFirestore(firebaseApp);
+const storage = getStorage(firebaseApp);
 
 /* ==========================================================================
    EmailJS configuration
@@ -206,6 +210,24 @@ async function saveSyllabusProgress(progress) {
   await setDoc(doc(db, 'syllabus', 'current'), { weeks: progress });
 }
 
+/* ---- Terminal state cross-device sync (paired with linux-terminal's own
+   IndexedDB-based local persistence — this is the cloud copy that lets a
+   student's saved terminal work follow them to a different browser/device).
+   ========================================================================== */
+async function uploadTerminalState(uid, arrayBuffer, savedAt) {
+  await uploadBytes(storageRef(storage, 'terminal-states/' + uid + '.bin'), arrayBuffer);
+  await updateDoc(doc(db, 'students', uid), { terminalStateSavedAt: savedAt });
+}
+
+async function downloadTerminalState(uid) {
+  try {
+    return await getBytes(storageRef(storage, 'terminal-states/' + uid + '.bin'));
+  } catch (err) {
+    if (err && err.code === 'storage/object-not-found') return null;
+    throw err;
+  }
+}
+
 function usernameFromName(name) {
   const cleaned = String(name || '').trim().replace(/\s+/g, '').replace(/[^a-zA-Z0-9_.-]/g, '').slice(0, 24);
   return cleaned || 'guest';
@@ -225,6 +247,8 @@ window.JLLPortal = {
   getStudent,
   loadSyllabusProgress,
   saveSyllabusProgress,
+  uploadTerminalState,
+  downloadTerminalState,
   sendEnrollmentEmail,
   initEmailJS,
   onAuthReady,

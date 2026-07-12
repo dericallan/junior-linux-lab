@@ -315,7 +315,7 @@ function initPortal() {
         iframe.className = 'terminal-iframe';
         iframe.src = MENTOR_TERMINAL_BASE_URL + '?user=' + encodeURIComponent(MENTOR_TERMINAL_USERNAME);
         iframe.title = t.label;
-        iframe.allow = 'fullscreen';
+        iframe.allow = 'fullscreen; clipboard-read; clipboard-write';
         iframe.setAttribute('allowfullscreen', 'true');
         panelsContainer.appendChild(iframe);
       }

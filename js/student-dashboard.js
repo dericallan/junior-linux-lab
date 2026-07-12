@@ -7,7 +7,8 @@ function initStudentDashboard() {
   const {
     getStudent, setStudentProjects, sendEnrollmentEmail, initEmailJS,
     onAuthReady, getCurrentUser, isMentorUser, logout, changeStudentPassword,
-    escapeHtml, loadSyllabusProgress, usernameFromName
+    escapeHtml, loadSyllabusProgress, usernameFromName,
+    uploadTerminalState, downloadTerminalState
   } = window.JLLPortal;
 
   initEmailJS();
@@ -33,9 +34,108 @@ function initStudentDashboard() {
     }
 
     const TERMINAL_BASE_URL = 'https://dericallan.github.io/browser-linux-terminal/';
+    const TERMINAL_ORIGIN = new URL(TERMINAL_BASE_URL).origin;
     const MAX_TERMINALS = 4;
     let terminalTabs = []; // { id, label }
     let terminalCounter = 0;
+    // Only the primary (first/"watchable") terminal tab is synced to the
+    // cloud — same reasoning as live-watch: one predictable session per
+    // student, so multiple simultaneously-open tabs don't race over the
+    // same saved slot. Extra tabs still get the terminal's own local
+    // (same-browser-only) persistence, just not cross-device sync.
+    let primaryTerminalId = null;
+
+    function getPrimaryIframeWindow() {
+      const el = primaryTerminalId && document.getElementById(primaryTerminalId);
+      return el ? el.contentWindow : null;
+    }
+
+    /* ---------------- Terminal cloud sync (cross-device) ---------------- */
+    let pendingMetaResolve = null;
+    let pendingStateResolve = null;
+
+    window.addEventListener('message', (event) => {
+      if (event.origin !== TERMINAL_ORIGIN) return;
+      const primaryWin = getPrimaryIframeWindow();
+      if (!primaryWin || event.source !== primaryWin) return;
+
+      const msg = event.data;
+      if (!msg || typeof msg !== 'object') return;
+
+      if (msg.type === 'jll-boot-complete') {
+        syncTerminalOnBoot();
+      } else if (msg.type === 'jll-state-meta') {
+        if (pendingMetaResolve) { pendingMetaResolve(msg.savedAt || 0); pendingMetaResolve = null; }
+      } else if (msg.type === 'jll-state') {
+        if (pendingStateResolve) { pendingStateResolve({ state: msg.state, savedAt: msg.savedAt }); pendingStateResolve = null; }
+      }
+    });
+
+    function requestLocalMeta(timeoutMs) {
+      return new Promise((resolve) => {
+        const win = getPrimaryIframeWindow();
+        if (!win) { resolve(0); return; }
+        pendingMetaResolve = resolve;
+        win.postMessage({ type: 'jll-get-state-meta' }, TERMINAL_ORIGIN);
+        setTimeout(() => {
+          if (pendingMetaResolve === resolve) { pendingMetaResolve = null; resolve(0); }
+        }, timeoutMs || 4000);
+      });
+    }
+
+    function requestLocalState(timeoutMs) {
+      return new Promise((resolve) => {
+        const win = getPrimaryIframeWindow();
+        if (!win) { resolve(null); return; }
+        pendingStateResolve = resolve;
+        win.postMessage({ type: 'jll-get-state' }, TERMINAL_ORIGIN);
+        setTimeout(() => {
+          if (pendingStateResolve === resolve) { pendingStateResolve = null; resolve(null); }
+        }, timeoutMs || 20000);
+      });
+    }
+
+    // Runs once, right after the primary tab finishes its own local
+    // boot-or-restore: pulls the cloud copy down only if it's newer than
+    // what's already loaded locally, so a fresher local session (made since
+    // the last cloud sync) never gets clobbered by a stale cloud copy.
+    async function syncTerminalOnBoot() {
+      try {
+        const localSavedAt = await requestLocalMeta();
+        const cloudSavedAt = student.terminalStateSavedAt || 0;
+        if (cloudSavedAt > localSavedAt) {
+          const cloudState = await downloadTerminalState(user.uid);
+          const win = getPrimaryIframeWindow();
+          if (cloudState && win) {
+            win.postMessage({ type: 'jll-set-state', state: cloudState }, TERMINAL_ORIGIN);
+          }
+        }
+      } catch (err) {
+        console.warn('[Junior Linux Lab] Terminal cloud sync (pull) failed:', err);
+      }
+    }
+
+    // Pushes the primary tab's current state to the cloud. Triggered on
+    // natural "leaving" moments (switching dashboard tabs away from
+    // Terminal, backgrounding the browser tab, logging out) rather than on
+    // a fixed timer — full VM snapshots run tens of MB, so syncing only
+    // when there's an actual reason to keeps Firebase usage (and the free
+    // tier's daily quota) proportional to real use.
+    async function pushTerminalStateToCloud() {
+      try {
+        const result = await requestLocalState();
+        if (result && result.state) {
+          await uploadTerminalState(user.uid, result.state, result.savedAt);
+          student.terminalStateSavedAt = result.savedAt;
+        }
+      } catch (err) {
+        console.warn('[Junior Linux Lab] Terminal cloud sync (push) failed:', err);
+      }
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') pushTerminalStateToCloud();
+    });
 
     const terminalUsername = usernameFromName(student.studentName || student.parentName);
 
@@ -163,7 +263,7 @@ function initStudentDashboard() {
       if (student.feeStatus !== 'paid') { renderLocked('student-tab-terminal', 'The terminal'); return; }
       const panel = document.getElementById('student-tab-terminal');
       panel.innerHTML =
-        '<p class="portal-hint" style="margin-top:0; text-align:left;">Logged in as <code>' + escapeHtml(terminalUsername) + '@terminal</code>. Each tab is its own independent Linux session — state resets if you close or restart it.</p>' +
+        '<p class="portal-hint" style="margin-top:0; text-align:left;">Logged in as <code>' + escapeHtml(terminalUsername) + '@terminal</code>. Your first terminal tab auto-saves and follows you across devices; extra tabs are independent scratch sessions saved only in this browser.</p>' +
         '<div class="terminal-tabs-bar" id="terminal-tabs-bar"></div>' +
         '<div class="terminal-panels" id="terminal-panels"></div>';
 
@@ -195,15 +295,21 @@ function initStudentDashboard() {
         return;
       }
       terminalCounter++;
-      // Only the first tab is watchable by a mentor, so there's one predictable
-      // session to mirror per student (avoids peer-ID collisions across tabs).
+      // Only the first tab is watchable by a mentor / synced to the cloud, so
+      // there's one predictable session to mirror per student (avoids
+      // peer-ID collisions and cloud-sync races across simultaneous tabs).
       const tab = { id: 'term-' + terminalCounter, label: 'Terminal ' + terminalCounter, watchable: terminalCounter === 1 };
+      if (tab.watchable) primaryTerminalId = tab.id;
       terminalTabs.push(tab);
       redrawTerminalTabs(tab.id);
     }
 
     function closeTerminalTab(id) {
       const wasActive = document.getElementById(id) && document.getElementById(id).classList.contains('active-terminal-panel');
+      if (id === primaryTerminalId) {
+        pushTerminalStateToCloud();
+        primaryTerminalId = null;
+      }
       terminalTabs = terminalTabs.filter(t => t.id !== id);
       const panel = document.getElementById(id);
       if (panel) panel.remove();
@@ -239,9 +345,9 @@ function initStudentDashboard() {
           const iframe = document.createElement('iframe');
           iframe.id = t.id;
           iframe.className = 'terminal-iframe';
-          iframe.src = TERMINAL_BASE_URL + '?user=' + encodeURIComponent(terminalUsername) + (t.watchable ? '&watchable=1' : '');
+          iframe.src = TERMINAL_BASE_URL + '?user=' + encodeURIComponent(terminalUsername) + '&disableReset=1' + (t.watchable ? '&watchable=1' : '');
           iframe.title = t.label;
-          iframe.allow = 'fullscreen';
+          iframe.allow = 'fullscreen; clipboard-read; clipboard-write';
           iframe.setAttribute('allowfullscreen', 'true');
           panelsContainer.appendChild(iframe);
         }
@@ -254,17 +360,21 @@ function initStudentDashboard() {
 
     /* ---------------- Tabs + Logout ---------------- */
     const studentTabButtons = document.querySelectorAll('#student-tabs .portal-tab-btn');
+    let activeStudentTab = 'overview';
     studentTabButtons.forEach(btn => {
       btn.addEventListener('click', () => {
         studentTabButtons.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         const tab = btn.getAttribute('data-tab');
+        if (activeStudentTab === 'terminal' && tab !== 'terminal') pushTerminalStateToCloud();
+        activeStudentTab = tab;
         document.querySelectorAll('.student-tab-panel').forEach(p => p.classList.add('hidden'));
         document.getElementById('student-tab-' + tab).classList.remove('hidden');
       });
     });
 
     document.getElementById('dashboard-logout-btn').addEventListener('click', async () => {
+      if (activeStudentTab === 'terminal') await pushTerminalStateToCloud();
       await logout();
       window.location.href = '../index.html';
     });
